@@ -29,7 +29,7 @@ class BuyerProfile extends Component {
     }
 
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/buyer/details`,{
                 credentials: 'include'
              })

@@ -20,7 +20,7 @@ class Cart extends Component {
 
     //get the first name of owner from backend  
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             const cart = JSON.parse(localStorage.getItem('cart'));
             if(cart){
                 this.setState({
@@ -98,7 +98,7 @@ class Cart extends Component {
                 </div>
             );
         }
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
         }
         return(

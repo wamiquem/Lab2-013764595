@@ -25,7 +25,7 @@ class Checkout extends Component {
 
     //get the first name of owner from backend  
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/buyer/address`,{
                 credentials: 'include'
              })
@@ -128,7 +128,7 @@ class Checkout extends Component {
     
     render(){
         let redirectVar = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
         }
         if(!this.props.location.state){

@@ -14,7 +14,7 @@ class BuyerAccount extends Component {
         //if Cookie is set render Buyer Home Page
         let redirectVar = null;
         let fname = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
         } else {
             fname = localStorage.getItem('fname')

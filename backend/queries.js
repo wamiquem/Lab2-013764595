@@ -1,28 +1,28 @@
 const con = require('./dbconnection_pool');
+const Buyer = require('./models/buyer');
+const Owner = require('./models/owner');
+const Restaurant = require('./models/restaurant');
 
 var queries = {};
 
 queries.createBuyer = (buyer, hash, successcb, failurecb) => {
-    let sql = "INSERT INTO buyers (email, password, fname, lname, image) VALUES ?";
-    const values = [buyer.email, hash, buyer.firstName, buyer.lastName, 'default_profile_pic.jpg']
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
+    const doc = new Buyer({
+        fname: buyer.firstName,
+        lname: buyer.lastName,
+        email: buyer.email,
+        password: hash,
+        image: "default_profile_pic.jpg"
     });
+    doc.save()
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 queries.getBuyerPasswordByEmail = (email, successcb, failurecb) => {
-    let sql = 'SELECT password,fname,id FROM buyers WHERE email = ?';
-    con.query(sql, [email], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Buyer.findOne({email})
+    .select('password fname _id')
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 queries.getBuyerPasswordById = (id, successcb, failurecb) => {
@@ -171,29 +171,26 @@ queries.updateBuyerImage = (buyer, successcb, failurecb) => {
 }
 
 queries.createOwner = (owner, hash, successcb, failurecb) => {
-    let sql = `INSERT INTO owners 
-    (email, password, fname, lname, phone, rest_name, rest_zip, image) 
-    VALUES ?`;
-    let values = [owner.email, hash, owner.fname, 
-        owner.lname, owner.phone, owner.restName, owner.restZip, 'default_profile_pic.jpg'];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
+    const doc = new Owner({
+        email: owner.email,
+        password: hash,
+        fname: owner.fname,
+        lname: owner.lname,
+        phone: owner.phone,
+        rest_name: owner.restName,
+        rest_zip: owner.restZip,
+        image: "default_profile_pic.jpg"
     });
+    doc.save()
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 queries.getOwnerPasswordByEmail = (email, successcb, failurecb) => {
-    let sql = 'SELECT password, id, fname FROM owners WHERE email = ?';
-    con.query(sql, [email], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Owner.findOne({email})
+    .select('password fname _id')
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 queries.getOwnerPasswordById = (id, successcb, failurecb) => {
@@ -330,18 +327,21 @@ queries.updateOwnerImage = (owner, successcb, failurecb) => {
 // }
 
 queries.createRestaurant = (restaurant, successcb, failurecb) => {
-    let sql = `INSERT INTO restaurants 
-    (owner_id, name, phone, street, city, state, zip, cuisine, image) 
-    VALUES ?`;
-    let values = [restaurant.ownerId, restaurant.name, restaurant.phone, restaurant.street, restaurant.city, 
-        restaurant.state, restaurant.zip, restaurant.cuisine, 'rest_default_image.jpg'];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
+    const doc = new Restaurant({
+        owner_id: restaurant.ownerId,
+        name: restaurant.name,
+        phone: restaurant.phone,
+        street: restaurant.street,
+        city: restaurant.city,
+        state: restaurant.state,
+        zip: restaurant.zip,
+        cuisine: restaurant.cuisine,
+        image: "rest_default_image.jpg"
     });
+    doc.save()
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
+
 }
 
 queries.updateRestaurant = (ownerId, restaurant, successcb, failurecb) => {

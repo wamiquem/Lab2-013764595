@@ -21,7 +21,7 @@ class OwnerHome extends Component {
 
     //get the first name of owner from backend  
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/allOrders`,{
             credentials: 'include'
             })
@@ -47,7 +47,7 @@ class OwnerHome extends Component {
         if(!fname){
             fname = localStorage.getItem('fname');
         }
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/"/>
         }
         return(

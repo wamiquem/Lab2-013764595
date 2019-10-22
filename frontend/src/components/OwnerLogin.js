@@ -90,7 +90,7 @@ class OwnerLogin extends Component {
     render(){
         //if Cookie is set render Owner Home Page
         let redirectVar = null;
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             redirectVar = <Redirect to= {{ pathname: "/owner/home", fname: this.state.fname}}/>
         }
         return(

@@ -59,7 +59,7 @@ class Menus extends Component {
     }
     
     componentDidMount(){
-        // if(cookie.load('cookie')){
+        // if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/menus`,{
                 credentials: 'include'
              })

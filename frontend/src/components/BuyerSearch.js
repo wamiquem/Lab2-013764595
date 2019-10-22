@@ -28,15 +28,21 @@ class BuyerSearch extends Component {
 
     //get the first name of buyer from backend  
     componentDidMount(){
-            if(cookie.load('cookie')){
+            if(localStorage.getItem('token')){
                 this.state.menuItem = (this.state.menuItem) ? this.state.menuItem : "";
                 this.searchRestaurants();
         }
     }
 
     searchRestaurants(){
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/buyer/searchRestaurants/?menuItem=${this.state.menuItem}`,{
-            credentials: 'include'
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+            credentials: 'include',
             })
             .then(res => res.json())
             .then(data => {
@@ -78,7 +84,7 @@ class BuyerSearch extends Component {
         const map = new Map();
         let redirectVar = null;
         let fname = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/"/>
         } else {
             fname = localStorage.getItem('fname')

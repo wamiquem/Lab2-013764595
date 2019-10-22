@@ -105,7 +105,7 @@ class BuyerSignup extends Component {
     render(){
         //if Cookie is set render Buyer Home Page
         let redirectVar = null;
-        // if(cookie.load('cookie')){
+        // if(localStorage.getItem('token')){
         //     redirectVar = <Redirect to= "/buyer/home"/>
         // }
         if(this.state.success){

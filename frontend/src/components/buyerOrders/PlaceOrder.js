@@ -23,7 +23,7 @@ class PlaceOrder extends Component {
         }
     
     componentDidMount(){
-        // if(cookie.load('cookie')){
+        // if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/menuItems/${this.state.restId}`,{
                 credentials: 'include'
                 })
@@ -82,7 +82,7 @@ class PlaceOrder extends Component {
         console.log("this.state.iscartempt", this.state.isCartEmpty);
         let redirectVar = null;
         let fname = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
         } else {
             fname = localStorage.getItem('fname');

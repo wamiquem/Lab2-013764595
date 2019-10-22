@@ -67,12 +67,13 @@ class BuyerLogin extends Component {
                 localStorage.setItem('userType','buyer');
                 res.text().then(data => {
                     console.log(data);
+                    localStorage.setItem('id',JSON.parse(data).id);
+                    localStorage.setItem('fname',JSON.parse(data).firstName);
+                    localStorage.setItem('token',JSON.parse(data).token);
                     this.setState({
                         authFlag : true,
                         fname: JSON.parse(data).firstName
                     });
-                    localStorage.setItem('id',JSON.parse(data).id);
-                    localStorage.setItem('fname',JSON.parse(data).firstName);
                 });
             }else{
                 res.text().then(data => {
@@ -91,7 +92,7 @@ class BuyerLogin extends Component {
     render(){
         //if Cookie is set render Buyer Home Page
         let redirectVar = null;
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             redirectVar = <Redirect to= {{ pathname: "/buyer/home", fname: this.state.fname}}/>
         }
         return(

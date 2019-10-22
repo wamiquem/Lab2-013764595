@@ -36,7 +36,7 @@ class BuyerHome extends Component {
         if(!fname){
             fname = localStorage.getItem('fname');
         }
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/"/>
         }
         return(

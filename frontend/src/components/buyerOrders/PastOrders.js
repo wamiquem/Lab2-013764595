@@ -17,7 +17,7 @@ class PastOrders extends Component {
 
     //get the first name of owner from backend  
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/buyer/pastOrders`,{
             credentials: 'include'
             })
@@ -33,7 +33,7 @@ class PastOrders extends Component {
     
     render(){
         let redirectVar = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/"/>
         }
         return(

@@ -3,6 +3,9 @@ var router = express.Router();
 const queries = require('../queries');
 const encrypt = require('../encrypt');
 const path = require('path');
+const {secret} = require('../config/config');
+var passport = require("passport");
+var jwt = require("jsonwebtoken");
 
 router.post('/signup',function(req,res){
     console.log("Inside Owner signup Post Request");
@@ -11,10 +14,10 @@ router.post('/signup',function(req,res){
 
     encrypt.generateHash(owner.password, hash => {
         queries.createOwner(owner, hash, result => {
-            console.log("Number of records inserted: " + result.affectedRows);
-            res.status(200).send({success: true, id: result.insertId, message:'Owner created'});
+            console.log("Owner created with id: " + result._id);
+            res.status(200).send({success: true, id: result._id, message:'Owner created'});
         }, err => {
-            if(err.code === 'ER_DUP_ENTRY'){
+            if(err.code === 11000){
                 res.status(401).send({success: false, message: `Email already exists. Plz sign up with a different email id. ${err.message}` });
             }else{
                 res.status(500).send({success: false, message: `Something failed when inserting record. ${err.message}`});
@@ -36,9 +39,16 @@ router.post('/login',function(req,res){
         if(row){
             encrypt.confirmPassword(password,row.password, result => {
                 if (result){
-                    res.cookie('cookie',{id: row.id},{maxAge: 3600000, httpOnly: false, path : '/'});
-                    req.session.user = email;
-                    res.status(200).json({success: true, message: "Owner Login successful", id: row.id, firstName: row.fname});
+                    // res.cookie('cookie',{id: row.id},{maxAge: 3600000, httpOnly: false, path : '/'});
+                    let user = {
+                        email: email,
+                        id: row.id,
+                        userType: 'buyer'
+                    }
+                    var token = jwt.sign(user, secret, {
+                        expiresIn: 10080 // in seconds
+                    });
+                    res.status(200).json({success: true, message: "Owner Login successful", id: row.id, firstName: row.fname, token: token});
                 }else{
                     res.status(401).json({success: false, message: "Incorrect Password. Please try again"});
                 }

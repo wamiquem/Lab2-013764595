@@ -25,7 +25,7 @@ class MenuAddForm extends Component {
 
     componentDidMount(){
         console.log("inside component mount");
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/sections`,{
                 credentials: 'include'
              })

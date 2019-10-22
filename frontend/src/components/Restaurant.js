@@ -14,7 +14,7 @@ class Restaurant extends Component {
     render(){
       let redirectVar = null;
       let fname = null;
-      if(!cookie.load('cookie')){
+      if(!localStorage.getItem('token')){
         redirectVar = <Redirect to= "/owner/login"/>
       } else {
         fname = localStorage.getItem('fname')

@@ -64,7 +64,7 @@ class SectionAddForm extends Component {
     render(){
         //if Cookie is not set render Owner Login Page
         let redirectVar = null;
-        if(!cookie.load('cookie')){
+        if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/owner/login"/>
         }
         return(

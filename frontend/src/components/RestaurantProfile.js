@@ -28,7 +28,7 @@ class RestaurantProfile extends Component {
     }
 
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/details`,{
                 credentials: 'include'
              })

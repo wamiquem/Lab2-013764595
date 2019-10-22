@@ -52,7 +52,7 @@ class Sections extends Component {
     }
     
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/restaurant/sections/`,{
                 credentials: 'include'
              })

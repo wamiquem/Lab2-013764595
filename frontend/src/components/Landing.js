@@ -10,7 +10,7 @@ class Landing extends Component {
         //if Cookie is set render Logout Button
         let redirectVar = null;
         
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             if(localStorage.getItem('userType') === 'buyer'){
                 redirectVar = <Redirect to="/buyer/home"/>;
             }

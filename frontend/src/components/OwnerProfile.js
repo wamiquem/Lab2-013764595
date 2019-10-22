@@ -25,7 +25,7 @@ class OwnerProfile extends Component {
     }
     
     componentDidMount(){
-        if(cookie.load('cookie')){
+        if(localStorage.getItem('token')){
             fetch(`${backendURL}/owner/details`,{
                 credentials: 'include'
              })

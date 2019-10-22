@@ -9,10 +9,10 @@ router.post('/create',function(req,res){
     const restaurant = req.body;
 
     queries.createRestaurant(restaurant, result => {
-        console.log("Number of records inserted: " + result.affectedRows);
+        console.log("Restaurant added with id: " + result._id);
         res.status(200).send({message:'Restaurant created'});
     }, err => {
-        if(err.code === 'ER_DUP_ENTRY'){
+        if(err.code === 11000){
             res.status(401).send({ message: 'A restaurant with this name already exists.' });
         }else{
             res.status(500).send({ message: `Something failed when inserting record. ${err.message}`});
@@ -78,22 +78,6 @@ router.get('/sections',function(req,res){
     }
     
 });
-
-// router.get('/sections/:restId',function(req,res){
-//     console.log("Inside Restaurant Sections Get Request");
-//     console.log("Req Params : ",req.params);
-
-//     let restId = req.params.restId;
-//     queries.getRestaurantIdByOwnerId(restId, result=> {
-//         queries.getSectionByRestaurantId(result.id, row => {
-//             res.status(200).json({success: true, sections: row});
-//         }, err=>{
-//             res.status(500).send({ message: `Something failed when getting sections from the table. ${err.message}`});
-//         });
-//     }, err => {
-//         res.status(500).send({ message: `Something failed when getting restaurant Id. ${err.message}`});
-//     });
-// });
 
 router.post('/deleteSection',function(req,res){
     console.log("Inside Restaurant Delete Section Post Request");

@@ -66,12 +66,13 @@ class OwnerLogin extends Component {
                 localStorage.setItem('userType','owner');
                 res.text().then(data => {
                     console.log(data);
+                    localStorage.setItem('id',JSON.parse(data).id);
+                    localStorage.setItem('fname',JSON.parse(data).firstName);
+                    localStorage.setItem('token',JSON.parse(data).token);
                     this.setState({
                         authFlag : true,
                         fname: JSON.parse(data).firstName
                     });
-                    localStorage.setItem('id',JSON.parse(data).id);
-                    localStorage.setItem('fname',JSON.parse(data).firstName);
                 });
             }else{
                 res.text().then(data => {

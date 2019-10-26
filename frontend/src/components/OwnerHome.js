@@ -1,6 +1,4 @@
 import React,{Component} from 'react';
-import {Link} from 'react-router-dom';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
 import OldOrdersList from './ownerOrders/OldOrdersList';
@@ -22,14 +20,13 @@ class OwnerHome extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/restaurant/allOrders`,{
+            fetch(`${backendURL}/restaurant/allOrders/?ownerId=${localStorage.getItem('id')}`,{
             credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {                
                 this.setState({
-                    firstName: data.firstName,
-                    orders: data.orders
+                    orders: this.state.orders.concat(data.orders)
                 })
             })
             .catch(err => console.log(err));
@@ -40,7 +37,7 @@ class OwnerHome extends Component {
         const oldOrders = [];
         const newOrders =[];
         if (this.state.orders) {
-            this.state.orders.forEach(order => (order.orderStatus === 'Delivered' || order.orderStatus === 'Cancel' ? oldOrders : newOrders).push(order));
+            this.state.orders.forEach(order => (order.status === 'Delivered' || order.status === 'Cancelled' ? oldOrders : newOrders).push(order));
         }
         let redirectVar = null;
         let fname = this.props.location.fname;

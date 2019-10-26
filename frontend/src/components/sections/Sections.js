@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import SectionAddForm from './SectionAddForm';
 import SectionsList from './SectionsList';
 import backendURL from '../../urlconfig';
@@ -18,7 +17,7 @@ class Sections extends Component {
 
     handleDelete = sectionId => {
         this.setState( state => {
-            const sections = state.sections.filter(section => section.id != sectionId);
+            const sections = state.sections.filter(section => section._id != sectionId);
             return {
                 sections
             };
@@ -35,7 +34,7 @@ class Sections extends Component {
         this.setState(state => {
             const sections = state.sections.map(section => {
                 // Find a section with the matching id
-                if(section.id == id){
+                if(section._id === id){
                     //Return a new object
                     return{
                         ...section, //copy the existing section
@@ -53,7 +52,7 @@ class Sections extends Component {
     
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/restaurant/sections/`,{
+            fetch(`${backendURL}/restaurant/sections/?ownerId=${localStorage.getItem('id')}`,{
                 credentials: 'include'
              })
             .then(res => res.json())
@@ -67,7 +66,7 @@ class Sections extends Component {
     }
 
     render(){
-        console.log("Section state = ", this.state)
+        console.log("Section state = ", this.state);
         return(
             <div>
                 <SectionAddForm onAdd = {this.handleAdd}/>

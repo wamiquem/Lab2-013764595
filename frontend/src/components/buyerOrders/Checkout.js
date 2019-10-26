@@ -26,18 +26,20 @@ class Checkout extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/buyer/address`,{
+            fetch(`${backendURL}/buyer/details/?id=${localStorage.getItem('id')}`,{
                 credentials: 'include'
              })
             .then(res => res.json())
             .then(data => {
                 this.setState({
-                    street: data.buyerAddress.street,
-                    unit: data.buyerAddress.unit_no,
-                    city: data.buyerAddress.city,
-                    state: data.buyerAddress.state,
-                    zip: data.buyerAddress.zip_code,
-                    phone: data.buyerAddress.phone
+                    fname: data.buyer.fname,
+                    lname: data.buyer.lname,
+                    street: data.buyer.street,
+                    unit: data.buyer.unit_no,
+                    city: data.buyer.city,
+                    state: data.buyer.state,
+                    zip: data.buyer.zip_code,
+                    phone: data.buyer.phone
                 });
             })
             .catch(err => console.log(err));
@@ -54,7 +56,7 @@ class Checkout extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = this.state;
-        fetch(`${backendURL}/buyer/updateAddress`, {
+        fetch(`${backendURL}/buyer/updateAddress/?id=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
@@ -88,11 +90,16 @@ class Checkout extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = {
+            buyerId: localStorage.getItem('id'),
             buyerAddress: `${this.state.unit}, ${this.state.street}, ${this.state.city}, ${this.state.state}, ${this.state.zip}`,
+            buyerName: `${this.state.fname} ${this.state.lname}`,
+            ownerId: this.props.location.state.ownerId,
             restId: this.props.location.state.restId,
+            restName: this.props.location.state.restName,
             items: this.props.location.state.items,
             totalPrice: this.props.location.totalPrice
         }
+        console.log("data==-=-=-=-==", data);
         fetch(`${backendURL}/buyer/placeOrder`, {
             method: "POST",
             headers: {
@@ -128,6 +135,7 @@ class Checkout extends Component {
     
     render(){
         let redirectVar = null;
+        let fname = null;
         if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
         }
@@ -136,11 +144,13 @@ class Checkout extends Component {
         }
         if(this.state.success){
             redirectVar = <Redirect to= "/buyer/account/upcoming-orders"/>
+        } else {
+            fname = localStorage.getItem('fname');
         }
         return(
             <div>
                 {redirectVar}
-                <Navbar/>
+                <Navbar firstName = {fname}/>
                 <div className="container">
                 <form onSubmit = {this.updateBuyerDetails}>
                     <div className="buyer-checkout">

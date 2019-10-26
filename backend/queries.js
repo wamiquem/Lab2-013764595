@@ -2,6 +2,8 @@ const con = require('./dbconnection_pool');
 const Buyer = require('./models/buyer');
 const Owner = require('./models/owner');
 const Restaurant = require('./models/restaurant');
+const Order = require('./models/order');
+const Counter = require('./models/counter');
 
 var queries = {};
 
@@ -38,52 +40,31 @@ queries.getBuyerPasswordById = (id, successcb, failurecb) => {
 }
 
 queries.getBuyerFirstNameById = (id, successcb, failurecb) => {
-    let sql = 'SELECT fname FROM buyers WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Buyer.findOne({_id:id})
+    .select('fname')
+    .then(buyer => successcb(buyer))
+    .catch(err => failurecb(err))
 }
 
-queries.getBuyerFirstAddressById = (id, successcb, failurecb) => {
-    let sql = 'SELECT phone, street, unit_no, city, state, zip_code FROM buyers WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+queries.getBuyerAddressById = (id, successcb, failurecb) => {
+    Buyer.findOne({_id: id})
+    .select('phone street unit_no city state zip_code')
+    .then(buyer => successcb(buyer))
+    .catch(err => failurecb(err))
 }
 
 queries.getBuyerImageNameById = (id, successcb, failurecb) => {
-    let sql = 'SELECT image FROM buyers WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Buyer.findOne({_id: id})
+    .select('image')
+    .then(buyer => successcb(buyer))
+    .catch(err => failurecb(err))
 }
 
 queries.getBuyerDetailsById = (id, successcb, failurecb) => {
-    let sql = `SELECT fname, lname, phone, street, unit_no, city, state, zip_code
-    FROM buyers WHERE id = ?`;
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Buyer.findOne({_id: id})
+    .select('fname lname phone street unit_no city state zip_code')
+    .then(buyer => successcb(buyer))
+    .catch(err => failurecb(err))
 }
 
 queries.updateBuyerName = (buyer, successcb, failurecb) => {
@@ -126,48 +107,54 @@ queries.updateBuyerPassword = (buyer, successcb, failurecb) => {
 }
 
 queries.updateBuyerAddress = (id, buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers 
-    SET phone = ?, street = ?, unit_no = ?, city = ?, state = ?, zip_code = ?
-    WHERE id = ?`;
-    let values = [buyer.phone, buyer.street, buyer.unit, buyer.city, buyer.state, buyer.zip, id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Buyer.findOne({_id:id})
+    .then(buyerToUpdate => {
+        buyerToUpdate["phone"] = buyer.phone;
+        buyerToUpdate["street"] = buyer.street;
+        buyerToUpdate["unit_no"] = buyer.unit;
+        buyerToUpdate["city"] = buyer.city;
+        buyerToUpdate["state"] = buyer.state;
+        buyerToUpdate["zip_code"] = buyer.zip;
+        buyerToUpdate.save()
+        .then(doc => {
+            successcb("Buyer Address Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.updateBuyerProfile = (id, buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers 
-    SET fname =?, lname =?, phone = ?, street = ?, unit_no = ?, city = ?, state = ?, zip_code = ?
-    WHERE id = ?`;
-    let values = [buyer.fname, buyer.lname, buyer.phone, 
-        buyer.street, buyer.unit, buyer.city, buyer.state, buyer.zip, id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Buyer.findOne({_id:id})
+    .then(buyerToUpdate => {
+        buyerToUpdate["fname"] = buyer.fname;
+        buyerToUpdate["lname"] = buyer.lname;
+        buyerToUpdate["phone"] = buyer.phone;
+        buyerToUpdate["street"] = buyer.street;
+        buyerToUpdate["unit_no"] = buyer.unit;
+        buyerToUpdate["city"] = buyer.city;
+        buyerToUpdate["state"] = buyer.state;
+        buyerToUpdate["zip_code"] = buyer.zip;
+        buyerToUpdate.save()
+        .then(doc => {
+            successcb("Buyer Profile Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.updateBuyerImage = (buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers 
-    SET image = ?
-    WHERE id = ?`;
-    let values = [buyer.image, buyer.id];
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Buyer.findOne({_id: buyer.id})
+    .then(buyerToUpdate => {
+        buyerToUpdate["image"] = buyer.image;
+        buyerToUpdate.save()
+        .then(doc => {
+            successcb("Buyer Image Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.createOwner = (owner, hash, successcb, failurecb) => {
@@ -206,40 +193,24 @@ queries.getOwnerPasswordById = (id, successcb, failurecb) => {
 }
 
 queries.getOwnerFirstNameById = (id, successcb, failurecb) => {
-    let sql = 'SELECT fname FROM owners WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Owner.findOne({_id:id})
+    .select('fname')
+    .then(owner => successcb(owner))
+    .catch(err => failurecb(err))
 }
 
 queries.getOwnerImageNameById = (id, successcb, failurecb) => {
-    let sql = 'SELECT image FROM owners WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Owner.findOne({_id: id})
+    .select('image')
+    .then(owner => successcb(owner))
+    .catch(err => failurecb(err))
 }
 
 queries.getOwnerDetailsById = (id, successcb, failurecb) => {
-    let sql = `SELECT fname, lname, phone, rest_name, rest_zip
-    FROM owners WHERE id = ?`;
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Owner.findOne({_id: id})
+    .select('fname lname phone rest_name rest_zip')
+    .then(owner => successcb(owner))
+    .catch(err => failurecb(err))
 }
 
 queries.updateOwnerName = (owner, successcb, failurecb) => {
@@ -282,49 +253,34 @@ queries.updateOwnerPassword = (owner, successcb, failurecb) => {
 }
 
 queries.updateOwnerProfile = (id, owner, successcb, failurecb) => {
-    let sql = `UPDATE owners 
-    SET fname =?, lname =?, phone = ?, rest_name = ?, rest_zip = ?
-    WHERE id = ?`;
-    let values = [owner.fname, owner.lname, owner.phone, owner.restName, owner.restZip, id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Owner.findOne({_id:id})
+    .then(ownerToUpdate => {
+        ownerToUpdate["fname"] = owner.fname;
+        ownerToUpdate["lname"] = owner.lname;
+        ownerToUpdate["phone"] = owner.phone;
+        ownerToUpdate["rest_name"] = owner.restName;
+        ownerToUpdate["rest_zip"] = owner.restZip;
+        ownerToUpdate.save()
+        .then(doc => {
+            successcb("Owner Profile Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.updateOwnerImage = (owner, successcb, failurecb) => {
-    let sql = `UPDATE owners 
-    SET image = ?
-    WHERE id = ?`;
-    let values = [owner.image, owner.id];
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Owner.findOne({_id: owner.id})
+    .then(ownerToUpdate => {
+        ownerToUpdate["image"] = owner.image;
+        ownerToUpdate.save()
+        .then(doc => {
+            successcb("Owner Image Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
-
-// queries.checkIfRestaurantExists = (ownerId, successcb, failurecb) => {
-//     let sql = 'SELECT restaurant_name FROM restaurants WHERE id = ?';
-//     con.query(sql, [ownerId], function (err, row){
-//         if (err){
-//             failurecb(err);
-//             return;
-//         }
-//         if(row.length>0){
-//             successcb({message: "Restaurant Exists", exists: true});
-//         }else{
-//             successcb({message: "Restaurant Does not Exists", exists: false});
-//         }
-        
-//     });
-// }
 
 queries.createRestaurant = (restaurant, successcb, failurecb) => {
     const doc = new Restaurant({
@@ -341,7 +297,6 @@ queries.createRestaurant = (restaurant, successcb, failurecb) => {
     doc.save()
     .then(result => successcb(result))
     .catch(err => failurecb(err))
-
 }
 
 queries.updateRestaurant = (ownerId, restaurant, successcb, failurecb) => {
@@ -359,18 +314,17 @@ queries.updateRestaurant = (ownerId, restaurant, successcb, failurecb) => {
     });
 }
 
-queries.updateRestaurantImage = (restaurant, successcb, failurecb) => {
-    let sql = `UPDATE restaurants 
-    SET image = ?
-    WHERE owner_id = ?`;
-    let values = [restaurant.image, restaurant.id];
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+queries.updateRestaurantImageByOwnerId = (restaurant, successcb, failurecb) => {
+    Restaurant.findOne({owner_id: restaurant.ownerId})
+    .then(restaurantToUpdate => {
+        restaurantToUpdate["image"] = restaurant.image;
+        restaurantToUpdate.save()
+        .then(doc => {
+            successcb("Restaurant Image Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.getRestaurantIdByOwnerId = (ownerId, successcb, failurecb) => {
@@ -385,30 +339,33 @@ queries.getRestaurantIdByOwnerId = (ownerId, successcb, failurecb) => {
     });
 }
 
-queries.getOwnerIdByRestaurantId = (restId, successcb, failurecb) => {
-    let sql = 'SELECT owner_id FROM restaurants WHERE id = ?';
-
-    con.query(sql, [restId], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
-}
+// queries.getOwnerIdByRestaurantId = (restId, successcb, failurecb) => {
+//     Restaurant.findOne({_id: restId})
+//     .select('owner_id')
+//     .then(restaurant => {
+//         console.log("restaurant ===", restaurant);successcb(restaurant)})
+//     .catch(err => failurecb(err))
+// }
 
 queries.addSection = (section, successcb, failurecb) => {
-    let sql = `INSERT INTO sections 
-    (rest_id, name) 
-    VALUES ?`;
-    let values = [section.restId, section.name];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
+    Restaurant.findOne({owner_id: section.ownerId})
+    .then(restaurant => {
+        let sectionExists = restaurant.sections.find(existingSection => existingSection.name === section.name);
+        if(sectionExists){
+            var error =  new Error('Section with same name already exists.');
+            error.code = "DUPLICATE_SECTION";
+            throw error;
         }
-        successcb(result);
-    });
+        let newSection = {name: section.name};
+        restaurant.sections.push(newSection);
+        restaurant.save()
+        .then(doc => {
+            let addedSection = doc.sections.find(eachSection => eachSection.name === section.name);
+            successcb(addedSection._id)
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.getSectionByRestaurantId = (restId, successcb, failurecb) => {
@@ -423,72 +380,90 @@ queries.getSectionByRestaurantId = (restId, successcb, failurecb) => {
     });
 }
 
-queries.deleteSection = (id, successcb, failurecb) => {
-    let sql = 'DELETE FROM sections WHERE id = ?';
-    
-    con.query(sql, [id], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        console.log("No err");
-        successcb(result);
-    });
+queries.getSectionsByOwnerId = (ownerId, successcb, failurecb) => {
+    Restaurant.findOne({owner_id: ownerId})
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
+}
+
+queries.getSectionsByRestaurantId = (restId, successcb, failurecb) => {
+    Restaurant.findOne({_id: restId})
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
+}
+
+queries.deleteSection = (section, successcb, failurecb) => {
+    Restaurant.findOne({owner_id: section.ownerId})
+    .then(restaurant => {
+        restaurant.sections.pull({_id: section.id});
+        restaurant.save()
+        .then(doc => {
+            successcb("Section Deleted");
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.updateSection = (section, successcb, failurecb) => {
-    let sql = `UPDATE sections 
-    SET name = ?
-    WHERE id = ?`;
-    let values = [section.name, section.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
+    Restaurant.findOne({owner_id: section.ownerId})
+    .then(restaurant => {
+        let sectionExists = restaurant.sections.find(existingSection => existingSection.name === section.name);
+        if(sectionExists){
+            var error =  new Error('Section with same name already exists.');
+            error.code = "DUPLICATE_SECTION";
+            throw error;
         }
-        successcb(result);
-    });
+        let updatedSection = restaurant.sections.id(section.id);
+        updatedSection["name"] = section.name;
+        restaurant.save()
+        .then(doc => {
+            successcb("Section Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.addMenu = (menu, successcb, failurecb) => {
-    let sql = `INSERT INTO menus 
-    (section_id, rest_id, name, description, price, image) 
-    VALUES ?`;
-    let values = [menu.sectionId, menu.restId, menu.name, menu.description, menu.price, 'menu_default_image.png'];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
+    Restaurant.findOne({owner_id: menu.ownerId})
+    .then(restaurant => {
+        let menuExists = restaurant.sections.id(menu.sectionId).menus.find(existingMenu => existingMenu.name === menu.name);
+        if(menuExists){
+            var error =  new Error('Menu with same name already exists.');
+            error.code = "DUPLICATE_MENU";
+            throw error;
         }
-        successcb(result);
-    });
+        let newMenu = {
+            name: menu.name,
+            description: menu.description,
+            price: menu.price,
+            image: "menu_default_image.png"
+        };
+        restaurant.sections.id(menu.sectionId).menus.push(newMenu);
+        restaurant.save()
+        .then(doc => {
+            let updatedSection = doc.sections.find(eachSection => eachSection._id.equals(menu.sectionId));
+            let addedMenu = updatedSection.menus.find(eachMenu => eachMenu.name === menu.name);
+            successcb(addedMenu._id)
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.updateMenuImage = (menu, successcb, failurecb) => {
-    let sql = `UPDATE menus 
-    SET image = ?
-    WHERE id = ?`;
-    let values = [menu.image, menu.id];
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.deleteMenuBySectionId = (sectionId, successcb, failurecb) => {
-    let sql = 'DELETE FROM menus WHERE section_id = ?';
-    
-    con.query(sql, [sectionId], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Restaurant.findOne({owner_id: menu.ownerId})
+    .then(restaurant => {
+        let updatedMenu = restaurant.sections.id(menu.sectionId).menus.id(menu.id);
+        updatedMenu["image"] = menu.image;
+        restaurant.save()
+        .then(doc => {
+            successcb("Menu Image Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.deleteMenuByMenuId = (menuId, successcb, failurecb) => {
@@ -501,6 +476,19 @@ queries.deleteMenuByMenuId = (menuId, successcb, failurecb) => {
         }
         successcb(result);
     });
+}
+
+queries.deleteMenu = (menu, successcb, failurecb) => {
+    Restaurant.findOne({owner_id: menu.ownerId})
+    .then(restaurant => {
+        restaurant.sections.id(menu.sectionId).menus.pull({_id: menu.id});
+        restaurant.save()
+        .then(doc => {
+            successcb("Menu Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.getMenuByRestaurantId = (restId, successcb, failurecb) => {
@@ -516,6 +504,12 @@ queries.getMenuByRestaurantId = (restId, successcb, failurecb) => {
     });
 }
 
+queries.getMenus = (ownerId, successcb, failurecb) => {
+    Restaurant.findOne({owner_id: ownerId})
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
+}
+
 queries.getMenuImageNameById = (id, successcb, failurecb) => {
     let sql = 'SELECT image FROM menus WHERE id = ?';
 
@@ -529,32 +523,66 @@ queries.getMenuImageNameById = (id, successcb, failurecb) => {
 }
 
 queries.updateMenu = (menu, successcb, failurecb) => {
-    let sql = `UPDATE menus 
-    SET section_id = ?, name = ?, description = ?, price = ?
-    WHERE id = ?`;
-    let values = [menu.sectionId, menu.name, menu.description, menu.price, menu.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
+    Restaurant.findOne({owner_id: menu.ownerId})
+    .then(restaurant => {
+        if(menu.initialSectionId === menu.newSectionId){
+            let menuExists = restaurant.sections.id(menu.newSectionId).menus.find(existingMenu => existingMenu.name === menu.name);
+            if(menuExists){
+                var error =  new Error('Menu with same name already exists.');
+                error.code = "DUPLICATE_MENU";
+                throw error;
+            }
+            let updatedMenu = restaurant.sections.id(menu.newSectionId).menus.id(menu.id);
+            updatedMenu["name"] = menu.name;
+            updatedMenu["description"] = menu.description;
+            updatedMenu["price"] = menu.price;
+        } else {
+            let menuExists = restaurant.sections.id(menu.newSectionId).menus.find(existingMenu => existingMenu.name === menu.name);
+            if(menuExists){
+                var error =  new Error('Menu with same name already exists.');
+                error.code = "DUPLICATE_MENU";
+                throw error;
+            }
+            restaurant.sections.id(menu.initialSectionId).menus.pull({_id: menu.id});
+            let updatedMenu = {
+                _id: menu.id,
+                name: menu.name,
+                description: menu.description,
+                price: menu.price,
+                image: menu.image
+            }
+            restaurant.sections.id(menu.newSectionId).menus.push(updatedMenu);
         }
-        successcb(result);
-    });
+        restaurant.save()
+        .then(doc => {
+            successcb("Menu Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.createOrder = (order, successcb, failurecb) => {
-    let sql = `INSERT INTO orders 
-    (buyer_id, buyer_address, restaurant_id, owner_id, status, price) 
-    VALUES ?`;
-    let values = [order.buyerId, order.buyerAddress, order.restId, order.ownerId,'New', order.price];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Counter.findByIdAndUpdate( "orderId" , { $inc: { seq: 1 }}, {new: true, upsert: true }).
+    select('seq')
+    .then(counter => {
+        const doc = new Order({
+            id: counter.seq,
+            buyerId: order.buyerId,
+            buyerName: order.buyerName,
+            buyerAddress: order.buyerAddress,
+            ownerId: order.ownerId,
+            restId: order.restId,
+            restName: order.restName,
+            totalPrice: order.totalPrice,
+            status: "New",
+            items: order.items
+        });
+        doc.save()
+        .then(order => successcb("Order created successfully"))
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.createOrderDetails = (orderId, items, successcb, failurecb) => {    
@@ -571,58 +599,22 @@ queries.createOrderDetails = (orderId, items, successcb, failurecb) => {
     });
 }
 
-queries.getAllOrders = (owner_id, successcb, failurecb) => {
-    let sql = `SELECT o.order_id, b.fname, b.lname, o.buyer_address, o.status, o.price 
-    FROM orders o, buyers b 
-    WHERE o.buyer_id = b.id
-    AND o.owner_id = ? order by order_id desc` ;
-    let values = [owner_id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+queries.getAllOrders = (ownerId, successcb, failurecb) => {
+    Order.find({ownerId: ownerId}).sort({ id: -1 })
+    .then(orders => successcb(orders))
+    .catch(err => failurecb(err))
 }
 
-queries.getUpcomingOrdersbyBuyerId = (buyer_id, successcb, failurecb) => {
-    let sql = `SELECT distinct o.order_id, o.buyer_address, o.status, o.price,
-    o.restaurant_id, r.name
-        FROM orders o, buyers b, restaurants r 
-        WHERE o.buyer_id = b.id
-        AND r.id = o.restaurant_id
-        AND o.buyer_id =  1 
-        AND o.status not in  ("Delivered", "Cancel") order by order_id desc;` ;
-    let values = [buyer_id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+queries.getUpcomingOrdersbyBuyerId = (buyerId, successcb, failurecb) => {
+    Order.find({buyerId: buyerId, status: {"$nin": ["Delivered", "Cancelled"]}}).sort({ id: -1 })
+    .then(orders => successcb(orders))
+    .catch(err => failurecb(err))
 }
 
-queries.getPastOrdersbyBuyerId = (buyer_id, successcb, failurecb) => {
-    let sql = `SELECT distinct o.order_id, o.buyer_address, o.status, o.price,
-    o.restaurant_id, r.name
-        FROM orders o, buyers b, restaurants r 
-        WHERE o.buyer_id = b.id
-        AND r.id = o.restaurant_id
-        AND o.buyer_id =  1 
-        AND o.status in  ("Delivered", "Cancel") order by order_id desc;` ;
-    let values = [buyer_id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+queries.getPastOrdersbyBuyerId = (buyerId, successcb, failurecb) => {
+    Order.find({buyerId: buyerId, status: {"$in": ["Delivered", "Cancelled"]}}).sort({ id: -1 })
+    .then(orders => successcb(orders))
+    .catch(err => failurecb(err))
 }
 
 queries.getMenuItemsByOrderId = (order_id, successcb, failurecb) => {
@@ -640,33 +632,26 @@ queries.getMenuItemsByOrderId = (order_id, successcb, failurecb) => {
 }
 
 queries.updateOrderStatus = (order, successcb, failurecb) => {
-    let sql = `UPDATE orders 
-    SET status = ?
-    WHERE order_id = ?`;
-    let values = [order.status, order.id];
-    console.log("****=",values);
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
+    Order.findOne({id:order.id})
+    .then(orderToUpdate => {
+        if(order.status == "Cancel"){
+            order.status ="Cancelled"
         }
-        successcb(result);
-    });
+        orderToUpdate["status"] = order.status;
+        orderToUpdate.save()
+        .then(updatedOrder => {
+            successcb("Order Status Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.getAllMatchingRestaurants = (menuItem, successcb, failurecb) => {
-    console.log("Inside name", menuItem);
-    let sql = `SELECT distinct r.cuisine, r.id, r.name, street, city, state from restaurants r, menus m
-            WHERE r.id = m.rest_id
-            AND m.name like '%` + menuItem +  `%' `;
-    con.query(sql, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Restaurant.find({"sections.menus.name": {$regex: menuItem, $options: 'i'}})
+    .select('cuisine id name street city state owner_id')
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 queries.getRestaurantsByCuisine = (cuisine, successcb, failurecb) => {
@@ -683,57 +668,43 @@ queries.getRestaurantsByCuisine = (cuisine, successcb, failurecb) => {
 }
 
 queries.getRestaurantDetailsByOwnerId = (ownerId, successcb, failurecb) => {
-    let sql = `SELECT name, phone, street, city, state, zip, cuisine
-    FROM restaurants WHERE owner_id = ?`;
-
-    con.query(sql, [ownerId], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Restaurant.findOne({owner_id: ownerId})
+    .select('name phone street city state zip cuisine')
+    .then(restaurant => successcb(restaurant))
+    .catch(err => failurecb(err))
 }
 
 queries.getRestaurantImageNameByOwnerId = (ownerId, successcb, failurecb) => {
-    let sql = 'SELECT image FROM restaurants WHERE owner_id = ?';
-
-    con.query(sql, [ownerId], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Restaurant.findOne({owner_id: ownerId})
+    .select('image')
+    .then(owner => successcb(owner))
+    .catch(err => failurecb(err))
 }
 
 queries.updateRestaurantProfile = (ownerId, rest, successcb, failurecb) => {
-    let sql = `UPDATE restaurants 
-    SET name =?, phone = ?, street = ?, city = ?, state = ?, zip_code = ?, cuisine = ?
-    WHERE owner_id = ?`;
-
-    let values = [rest.name, rest.phone, rest.street, 
-        rest.city, rest.state, rest.zip, rest.cuisine, ownerId];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
+    Restaurant.findOne({owner_id:ownerId})
+    .then(restaurantToUpdate => {
+        restaurantToUpdate["name"] = rest.name;
+        restaurantToUpdate["phone"] = rest.phone;
+        restaurantToUpdate["street"] = rest.street;
+        restaurantToUpdate["city"] = rest.city;
+        restaurantToUpdate["state"] = rest.state;
+        restaurantToUpdate["zip"] = rest.zip;
+        restaurantToUpdate["cuisine"] = rest.cuisine;
+        restaurantToUpdate.save()
+        .then(doc => {
+            successcb("Restaurant Profile Updated")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
 }
 
 queries.getRestaurantImageNameById = (restaurantId, successcb, failurecb) => {
-    let sql = 'SELECT image FROM restaurants WHERE id = ?';
-
-    con.query(sql, [restaurantId], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
+    Restaurant.findOne({_id: restaurantId})
+    .select('image')
+    .then(result => successcb(result))
+    .catch(err => failurecb(err))
 }
 
 module.exports = queries;

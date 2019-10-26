@@ -7,7 +7,8 @@ const restaurantSchema = mongoose.Schema({
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     phone: {
         type: String,
@@ -33,7 +34,31 @@ const restaurantSchema = mongoose.Schema({
     cuisine: {
         type: String,
         required: true
-    }
+    },
+    sections: [
+        {
+            id: mongoose.Schema.Types.ObjectId,
+            name: {
+                type: String,
+                required: true
+            },
+            menus : [
+                {
+                    id: mongoose.Schema.Types.ObjectId,
+                    name: {
+                        type: String,
+                        required: true,
+                    },
+                    description: String,
+                    price: {
+                        type: Number,
+                        required: true
+                    },
+                    image: String
+                }
+            ]
+        }
+    ]
 });
 
 module.exports = mongoose.model('Restaurants', restaurantSchema);

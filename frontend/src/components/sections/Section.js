@@ -17,7 +17,7 @@ class Section extends Component {
     }
 
     handleEditChange = e => {
-        this.props.onEditChange(this.props.section.id, e.target);
+        this.props.onEditChange(this.props.section._id, e.target);
     }
 
     editSection = () => {
@@ -37,7 +37,8 @@ class Section extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = {
-            id : this.props.section.id,
+            ownerId:localStorage.getItem('id'),
+            id : this.props.section._id,
             name : this.props.section.name
         }
 
@@ -78,7 +79,8 @@ class Section extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = {
-            id : this.props.section.id
+            ownerId:localStorage.getItem('id'),
+            id : this.props.section._id
         }
 
         fetch(`${backendURL}/restaurant/deleteSection`, {
@@ -93,7 +95,7 @@ class Section extends Component {
         .then(res => {
             if(res.status === 200){
                 res.text().then(data => console.log(data));
-                this.props.onDelete(this.props.section.id);
+                this.props.onDelete(this.props.section._id);
             }else{
                 res.text().then(data => {
                     console.log(data);

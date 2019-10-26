@@ -1,6 +1,5 @@
 import React,{Component} from 'react';
 import {Link} from 'react-router-dom';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
 import backendURL from '../urlconfig';
@@ -100,7 +99,7 @@ class BuyerSearch extends Component {
                             map.set(restaurant.cuisine, true);    // set any value to Map
                                 result.push({
                                     cuisine: restaurant.cuisine,
-                                    id: restaurant.id,
+                                    id: restaurant._id,
                                     name: restaurant.name
                             });
                         } 
@@ -145,10 +144,10 @@ class BuyerSearch extends Component {
                                             this.state.restaurants.map(restaurant => {
                                                 return (
                                                     <div className="container buyerSearList">
-                                                        <Link to={`/buyer/place-order/${restaurant.id}`}>
+                                                        <Link to={{ pathname: `/buyer/place-order/${restaurant._id}`, restName: restaurant.name, ownerId: restaurant.owner_id}}>
                                                         <div class="row  listrow"> 
                                                             <div class="col-md-4 buyer-menu-image">
-                                                                <img className="rounded float-left img-thumbnail" src = {`${backendURL}/buyer/restaurantImage/${restaurant.id}`} alt="Responsive image"></img>
+                                                                <img className="rounded float-left img-thumbnail" src = {`${backendURL}/buyer/restaurantImage/${restaurant._id}`} alt="Responsive image"></img>
                                                             </div>
                                                             <div class="col-md-8">
                                                                 <h3>{restaurant.name}</h3>

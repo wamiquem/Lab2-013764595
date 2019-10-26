@@ -26,22 +26,22 @@ class OwnerProfile extends Component {
     
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/owner/details`,{
+            fetch(`${backendURL}/owner/details/?id=${localStorage.getItem('id')}`,{
                 credentials: 'include'
              })
             .then(res => res.json())
             .then(data => {
                 this.setState({
-                    fname: data.firstName,
-                    lname: data.lastName,
-                    phone: data.phone,
-                    restName: data.restName,
-                    restZip: data.restZip
+                    fname: data.owner.fname,
+                    lname: data.owner.lname,
+                    phone: data.owner.phone,
+                    restName: data.owner.rest_name,
+                    restZip: data.owner.rest_zip
                 });
             })
             .catch(err => console.log(err));
 
-            fetch(`${backendURL}/owner/profilePic`,{
+            fetch(`${backendURL}/owner/profilePic/?id=${localStorage.getItem('id')}`,{
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -85,6 +85,7 @@ class OwnerProfile extends Component {
         e.preventDefault();
         const formData = new FormData();
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
+        formData.append('id', localStorage.getItem('id'));
         
         fetch(`${backendURL}/upload/owner-profile-image`, {
             method: 'POST',
@@ -115,7 +116,7 @@ class OwnerProfile extends Component {
     updateProfile = (e) => {
         e.preventDefault();
         const data = this.state;
-        fetch(`${backendURL}/owner/updateProfile`, {
+        fetch(`${backendURL}/owner/updateProfile/?id=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',

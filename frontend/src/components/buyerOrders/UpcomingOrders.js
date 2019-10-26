@@ -18,13 +18,13 @@ class UpcomingOrders extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/buyer/upcomingOrders`,{
+            fetch(`${backendURL}/buyer/upcomingOrders/?id=${localStorage.getItem('id')}`,{
             credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {                
                 this.setState({
-                    orders: data.orders
+                    orders: this.state.orders.concat(data.orders)
                 })
             })
             .catch(err => console.log(err));

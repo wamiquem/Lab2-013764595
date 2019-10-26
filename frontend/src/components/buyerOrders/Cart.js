@@ -7,7 +7,8 @@ import CartItem from './CartItem';
 
 const initialState = {
     items: [],
-    restId: ""
+    restId: "",
+    restName:""
 }
 class Cart extends Component {
      constructor(props){
@@ -25,7 +26,9 @@ class Cart extends Component {
             if(cart){
                 this.setState({
                     items: this.state.items.concat(cart.items),
-                    restId: cart.restId
+                    restId: cart.restId,
+                    restName: cart.restName,
+                    ownerId: cart.ownerId
                 })
             }
         }
@@ -50,9 +53,6 @@ class Cart extends Component {
                 localStorage.setItem('cart', JSON.stringify(this.state));
             }
         });
-
-       
-        // localStorage.setItem('cart', JSON.stringify(this.state));
     };
 
     emptyCart = e => {
@@ -61,8 +61,8 @@ class Cart extends Component {
     };
     
     render(){
-        console.log("Inside render");
         let redirectVar = null;
+        let fname = null;
         let cartBody = null;
         let cartFooter = null;
         if(this.state.items.length < 1){
@@ -100,22 +100,19 @@ class Cart extends Component {
         }
         if(!localStorage.getItem('token')){
             redirectVar = <Redirect to= "/buyer/login"/>
+        } else {
+            fname = localStorage.getItem('fname');
         }
         return(
             <div>
                 {redirectVar}
-                <Navbar firstName = {this.state.firstName} />
+                <Navbar firstName = {fname} />
                 <div className="container">
                     <div className="buyer-cart">
                         <div className="main-div">
                             <div className="panel">
                                 <h4>Your Order</h4>
                                 <hr/>
-                                {/* {
-                                    this.state.items.map(item => {
-                                        return <CartItem item = {item}/>
-                                    })
-                                } */}
                                 {cartBody}
                                 {cartFooter}
                             </div>

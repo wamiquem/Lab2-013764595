@@ -18,13 +18,13 @@ class PastOrders extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/buyer/pastOrders`,{
+            fetch(`${backendURL}/buyer/pastOrders/?id=${localStorage.getItem('id')}`,{
             credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {                
                 this.setState({
-                    orders: data.orders
+                    orders: this.state.orders.concat(data.orders)
                 })
             })
             .catch(err => console.log(err));

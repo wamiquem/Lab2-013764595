@@ -16,7 +16,7 @@ class Item extends Component {
     }
 
     componentDidMount(){
-        fetch(`${backendURL}/restaurant/menuImage/${this.props.item.id}`,{
+        fetch(`${backendURL}/restaurant/menuImage/?name=${this.props.item.image}`,{
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -40,7 +40,7 @@ class Item extends Component {
             price: this.props.item.price,
             quantity: this.state.quantity
         }
-        this.props.onAdd(this.props.item.rest_id, [item]);
+        this.props.onAdd(this.props.item.rest_id, this.props.item.rest_name, this.props.item.owner_id, [item]);
     }
 
     render(){

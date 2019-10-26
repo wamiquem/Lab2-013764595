@@ -6,10 +6,15 @@ class MenusList extends Component {
         super(props);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleEditChange = this.handleEditChange.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
         }
         
     handleDelete(menuId){
         this.props.onDelete(menuId);
+    }
+
+    handleUpdate(menuId, newSectionId){
+        this.props.onUpdate(menuId, newSectionId);
     }
 
     handleEditChange(menuId, name, value){
@@ -34,7 +39,8 @@ class MenusList extends Component {
                                                     .map(menu => {
                                                         return <Menu menu = {menu} sections = {this.props.sections}
                                                         onDelete = {this.handleDelete}
-                                                        onEditChange = {this.handleEditChange}/>
+                                                        onEditChange = {this.handleEditChange}
+                                                        onUpdate = {this.handleUpdate}/>
                                                     })
                                                 :
                                                 <span/>

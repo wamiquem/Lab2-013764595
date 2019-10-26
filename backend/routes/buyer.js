@@ -157,10 +157,10 @@ router.post('/updatePassword',function(req,res){
 
 router.post('/updateAddress',function(req,res){
     console.log("Inside Buyer Update Password Post Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
 
-    queries.updateBuyerAddress(req.cookies.cookie.id, req.body, sqlresult => {
-        console.log("Number of records updated: " + sqlresult.affectedRows);
+    queries.updateBuyerAddress(req.query.id, req.body, sqlresult => {
+        console.log("Buyer address and phone updated succesfully");
         res.status(200).send({message:'Buyer address and phone updated succesfully.'});    
     }, err => {
         res.status(500).send({message:`Something wrong when updating buyer address. ${err}`}); 
@@ -169,10 +169,10 @@ router.post('/updateAddress',function(req,res){
 
 router.post('/updateProfile',function(req,res){
     console.log("Inside Buyer Update Profile Post Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
 
-    queries.updateBuyerProfile(req.cookies.cookie.id, req.body, sqlresult => {
-        console.log("Number of records updated: " + sqlresult.affectedRows);
+    queries.updateBuyerProfile(req.query.id, req.body, doc => {
+        console.log("Buyer profile updated succesfully");
         res.status(200).send({message:'Buyer profile updated succesfully.'});    
     }, err => {
         res.status(500).json(`Something wrong when updating buyer profile. ${err}`);
@@ -181,10 +181,10 @@ router.post('/updateProfile',function(req,res){
 
 router.get('/firstName',function(req,res){
     console.log("Inside buyer First Name Get Request");
-    console.log("Req Cookie : ",req.cookies.cookie.id);
+    console.log("Req Query : ",req.query);
  
-    queries.getBuyerFirstNameById(req.cookies.cookie.id, row => {
-        res.status(200).json({success: true, firstName: row.fname});
+    queries.getBuyerFirstNameById(req.query.id, buyer => {
+        res.status(200).json({success: true, firstName: buyer.fname});
         console.log("Response Status", res.statusCode);
     }, err => {
         res.status(500).json({success: false, message: `Something wrong when reading buyer first name. ${err}`});
@@ -193,10 +193,10 @@ router.get('/firstName',function(req,res){
 
 router.get('/address',function(req,res){
     console.log("Inside buyer Address Get Request");
-    console.log("Req Cookie : ",req.body);
+    console.log("Req Query : ",req.query);
  
-    queries.getBuyerFirstAddressById(req.cookies.cookie.id, row => {
-        res.status(200).json({success: true, buyerAddress: row});
+    queries.getBuyerAddressById(req.query.id, buyerAddress => {
+        res.status(200).json({success: true, buyerAddress: buyerAddress});
     }, err => {
         res.status(500).json({success: false, message: `Something wrong when reading buyer first name. ${err}`});
     })
@@ -204,11 +204,10 @@ router.get('/address',function(req,res){
 
 router.get('/details',function(req,res){
     console.log("Inside buyer Details Get Request");
-    console.log("Req Cookie : ",req.body);
+    console.log("Req Query : ",req.query);
  
-    queries.getBuyerDetailsById(req.cookies.cookie.id, row => {
-        res.status(200).json({success: true, firstName: row.fname, lastName: row.lname, phone: row.phone,
-            street: row.street, unit: row.unit_no, city: row.city, state: row.state, zip: row.zip_code});
+    queries.getBuyerDetailsById(req.query.id, buyer => {
+        res.status(200).json({success: true, buyer: buyer});
     }, err => {
         res.status(200).json({success: false, message: `Something wrong when getting buyer details. ${err}`});
     })
@@ -216,22 +215,23 @@ router.get('/details',function(req,res){
 
 router.get('/profilePic',function(req,res){
     console.log("Inside buyer profile pic Get Request");
+    console.log("Req Query : ",req.query);
  
-    queries.getBuyerImageNameById(req.cookies.cookie.id, row => {
-        res.sendFile(path.join(__dirname, `../uploads/${row.image}`));
+    queries.getBuyerImageNameById(req.query.id, buyer => {
+        res.sendFile(path.join(__dirname, `../uploads/${buyer.image}`));
     }, err => {
         res.status(500).json({success: false, message: `Something wrong when reading buyer image. ${err}`});
     })
 });
 
 router.get('/searchRestaurants',passport.authenticate("jwt", { session: false }),function(req,res){
-    console.log("Insider search rest ");
+    console.log("Inside buyer search restaurants pic Get Request");
+    console.log("Request Query : ",req.query);
+
     const name = (req.query.menuItem) ? req.query.menuItem : "";
-    console.log("Request Query Parameter(Item Name): ",name);
     queries.getAllMatchingRestaurants(name, row => {
         console.log("Records",row);
-        res.status(200).json({success1: true, row});
-        console.log("Response Status", res.statusCode);
+        res.status(200).json({success: true, row});
     }, err => {
         res.status(500).json({success: false, message: `Something wrong while getting restaurants ${err}`});
     })
@@ -252,36 +252,19 @@ router.post('/placeOrder',function(req,res){
     console.log("Inside Buyer Place Order Post Request");
     console.log("Req Body : ",req.body);
     
-    queries.getOwnerIdByRestaurantId(req.body.restId, result => {
-        const order = {
-            buyerId: req.cookies.cookie.id, buyerAddress: req.body.buyerAddress, restId: req.body.restId,
-            ownerId: result.owner_id, price: req.body.totalPrice
-        }
-        queries.createOrder(order, row => { 
-            queries.createOrderDetails(row.insertId, req.body.items, sqlresult => {
-                res.status(200).send({success: true, message:'Order Created', orderId: sqlresult.insertId});
-            }, err => {
-                res.status(500).send({ message: `Something failed when creating order details. ${err.message}`});
-            });
-        }, err => {
-            res.status(500).send({ message: `Something failed when creating order. ${err.message}`});
-        });
-    }, err=> {
-        res.status(500).send({ message: `Something failed when getting owner id from the table. ${err.message}`});
+    const order = req.body;
+    queries.createOrder(order, message => {
+        res.status(200).send({success: true, message:message});
+    }, err => {
+        res.status(500).send({ message: `Something failed when creating order. ${err.message}`});
     });
 });
 
 router.get('/upcomingOrders',function(req,res){
     console.log("Inside Buyer Upcoming Orders Get Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
     
-    queries.getUpcomingOrdersbyBuyerId(req.cookies.cookie.id, row => {
-        const orders = row.map(order => {
-            return {
-                orderId: order.order_id, buyerAddress: order.buyer_address,
-                restName: order.name, orderPrice: order.price, orderStatus: order.status
-            }
-        });
+    queries.getUpcomingOrdersbyBuyerId(req.query.id, orders => {
         res.status(200).json({success: true, orders: orders});
     }, err=> {
         res.status(500).send({ message: `Something failed when getting order details from the table. ${err.message}`});
@@ -290,15 +273,9 @@ router.get('/upcomingOrders',function(req,res){
 
 router.get('/pastOrders',function(req,res){
     console.log("Inside Buyer Past Orders Get Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
     
-    queries.getPastOrdersbyBuyerId(req.cookies.cookie.id, row => {
-        const orders = row.map(order => {
-            return {
-                orderId: order.order_id, buyerAddress: order.buyer_address,
-                restName: order.name, orderPrice: order.price, orderStatus: order.status
-            }
-        });
+    queries.getPastOrdersbyBuyerId(req.query.id, orders => {
         res.status(200).json({success: true, orders: orders});
     }, err=> {
         res.status(500).send({ message: `Something failed when getting order details from the table. ${err.message}`});

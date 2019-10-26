@@ -6,7 +6,7 @@ class NewOrder extends Component {
         super(props);
 
         this.state = {
-            menuItems: [],
+            // menuItems: [],
             status: ""
         }
         //Bind the handlers to this class
@@ -14,25 +14,25 @@ class NewOrder extends Component {
         this.updateStatus = this.updateStatus.bind(this);
     }
 
-    componentDidMount(){
-        fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
-                credentials: 'include'
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            this.setState({
-                menuItems: data.menuItems
-            })
-        })
-        .catch(err => console.log(err));
-    }
+    // componentDidMount(){
+    //     fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
+    //             credentials: 'include'
+    //     })
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         console.log(data);
+    //         this.setState({
+    //             menuItems: data.menuItems
+    //         })
+    //     })
+    //     .catch(err => console.log(err));
+    // }
 
     updateStatus = (e) => {
         //prevent page from refresh
         e.preventDefault();
         const data = {
-            id : this.props.order.orderId,
+            id : this.props.order.id,
             status : this.state.status
         }
 
@@ -79,7 +79,7 @@ class NewOrder extends Component {
     render(){
         console.log(this.state)
         let statuses = ['New', 'Preparing', 'Ready', 'Delivered', 'Cancel'];
-        let itemDetails = this.state.menuItems.map(item => {
+        let itemDetails = this.props.order.items.map(item => {
             return(
                 <div style = {{display:'flex'}}>
                     <label>Menu Item:</label>
@@ -95,7 +95,7 @@ class NewOrder extends Component {
             <div>
                 <hr/>
                 <h2 style= {{color:"red"}}>{this.state.message}</h2>
-                <label style = {{fontSize:'17px'}}>Order# {this.props.order.orderId}</label>
+                <label style = {{fontSize:'17px'}}>Order# {this.props.order.id}</label>
                 <h5 style = {{textDecoration:'underline'}}>Buyer Details</h5>
                 <div style = {{display:'flex'}}>
                     <label>Buyer Name:</label>
@@ -107,7 +107,7 @@ class NewOrder extends Component {
                 {itemDetails}
                 <div style = {{display:'flex'}}>
                     <label>Total Price:</label>
-                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.orderPrice}</h7>
+                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.totalPrice}</h7>
                 </div>
                 <div style = {{display:'flex'}}>
                     <div class="form-group">
@@ -116,7 +116,7 @@ class NewOrder extends Component {
                         onChange = {this.handleEditChange}>
                             <option selected>Select Status</option>
                             {statuses.map( status => {
-                                if(status === this.props.order.orderStatus){
+                                if(status === this.props.order.status){
                                     return <option selected>{status}</option> ;
                                 } else {
                                     return <option>{status}</option> ;

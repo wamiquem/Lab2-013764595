@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import backendURL from '../urlconfig';
 
 //create the Buyer Profile Component
@@ -30,25 +29,25 @@ class BuyerProfile extends Component {
 
     componentDidMount(){
         if(localStorage.getItem('token')){
-            fetch(`${backendURL}/buyer/details`,{
+            fetch(`${backendURL}/buyer/details/?id=${localStorage.getItem('id')}`,{
                 credentials: 'include'
              })
             .then(res => res.json())
             .then(data => {
                 this.setState({
-                    fname: data.firstName,
-                    lname: data.lastName,
-                    phone: data.phone,
-                    street: data.street,
-                    unit: data.unit,
-                    city: data.city,
-                    state: data.state,
-                    zip: data.zip
+                    fname: data.buyer.fname,
+                    lname: data.buyer.lname,
+                    phone: data.buyer.phone,
+                    street: data.buyer.street,
+                    unit: data.buyer.unit_no,
+                    city: data.buyer.city,
+                    state: data.buyer.state,
+                    zip: data.buyer.zip_code
                 });
             })
             .catch(err => console.log(err));
 
-            fetch(`${backendURL}/buyer/profilePic`,{
+            fetch(`${backendURL}/buyer/profilePic/?id=${localStorage.getItem('id')}`,{
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -92,6 +91,7 @@ class BuyerProfile extends Component {
         e.preventDefault();
         const formData = new FormData();
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
+        formData.append('id', localStorage.getItem('id'));
         
         fetch(`${backendURL}/upload/buyer-profile-image`, {
             method: 'POST',
@@ -122,7 +122,7 @@ class BuyerProfile extends Component {
     updateProfile = (e) => {
         e.preventDefault();
         const data = this.state;
-        fetch(`${backendURL}/buyer/updateProfile`, {
+        fetch(`${backendURL}/buyer/updateProfile/?id=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
@@ -153,7 +153,7 @@ class BuyerProfile extends Component {
         .catch(err => console.log(err));
     }
 
-    render(){        
+    render(){
         let imageEdit = null;
         let profileEdit = null;
         let profileUpdate = null;

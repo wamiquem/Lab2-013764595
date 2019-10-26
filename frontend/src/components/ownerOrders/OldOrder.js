@@ -5,27 +5,27 @@ class OldOrder extends Component {
      constructor(props){
         super(props);
 
-        this.state = {
-            menuItems: []
-        }
+        // this.state = {
+        //     menuItems: []
+        // }
     }
 
-    componentDidMount(){
-        fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
-                credentials: 'include'
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            this.setState({
-                menuItems: data.menuItems
-            })
-        })
-        .catch(err => console.log(err));
-    }
+    // componentDidMount(){
+    //     fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
+    //             credentials: 'include'
+    //     })
+    //     .then(res => res.json())
+    //     .then(data => {
+    //         console.log(data);
+    //         this.setState({
+    //             menuItems: data.menuItems
+    //         })
+    //     })
+    //     .catch(err => console.log(err));
+    // }
 
     render(){
-        let itemDetails = this.state.menuItems.map(item => {
+        let itemDetails = this.props.order.items.map(item => {
             return(
                 <div style = {{display:'flex'}}>
                     <label>Menu Item:</label>
@@ -40,7 +40,7 @@ class OldOrder extends Component {
         return(
             <div>
                 <hr/>
-                <label style = {{fontSize:'17px'}}>Order# {this.props.order.orderId}</label>
+                <label style = {{fontSize:'17px'}}>Order# {this.props.order.id}</label>
                 <h5 style = {{textDecoration:'underline'}}>Buyer Details</h5>
                 <div style = {{display:'flex'}}>
                     <label>Buyer Name:</label>
@@ -52,11 +52,11 @@ class OldOrder extends Component {
                 {itemDetails}
                 <div style = {{display:'flex'}}>
                     <label>Total Price:</label>
-                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.orderPrice}</h7>
+                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.totalPrice}</h7>
                 </div>
                 <div style = {{display:'flex'}}>
                     <label>Order Status:</label>
-                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.orderStatus}</h7>
+                    <h7 style = {{paddingLeft:'5px'}}>{this.props.order.status}</h7>
                 </div>                
             </div>
         )

@@ -4,7 +4,6 @@ import backendURL from '../../urlconfig';
 class Menu extends Component {
      constructor(props){
         super(props);
-
         this.state = {
             isEditable: false,
             isNewImage: false,
@@ -22,7 +21,8 @@ class Menu extends Component {
     }
 
     componentDidMount(){
-        fetch(`${backendURL}/restaurant/menuImage/${this.props.menu.id}`,{
+        // fetch(`${backendURL}/restaurant/menuImage/${this.props.menu.id}`,{
+            fetch(`${backendURL}/restaurant/menuImage/?name=${this.props.menu.image}`,{
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -32,7 +32,7 @@ class Menu extends Component {
                 });
         })
     }
-
+    
     handleEditChange = e => {
         let fieldName = e.target.name;
         let fieldValue = e.target.value;
@@ -82,6 +82,7 @@ class Menu extends Component {
             if(res.status === 200){
                 res.text().then(data => {
                     console.log(data);
+                    this.props.onUpdate(this.props.menu.id, this.props.menu.section_id);
                     if(this.state.isNewImage){
                         successcb(JSON.parse(data).message);
                     } else {
@@ -114,13 +115,18 @@ class Menu extends Component {
             name : this.props.menu.name,
             price: this.props.menu.price,
             description: this.props.menu.description,
-            sectionId: this.props.menu.section_id
+            newSectionId: this.props.menu.section_id,
+            initialSectionId: this.props.menu.initial_section_id,
+            image: this.props.menu.image,
+            ownerId: localStorage.getItem('id')
         }
 
         this.postMenuData(data, success => {
             const formData = new FormData();
             formData.append('image', this.state.imageFile);
             formData.append('menuId', this.props.menu.id);
+            formData.append('sectionId', this.props.menu.section_id);
+            formData.append('ownerId', localStorage.getItem('id'));
             
             fetch(`${backendURL}/upload/menu-image`, {
                 method: 'POST',
@@ -143,7 +149,9 @@ class Menu extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = {
-            id : this.props.menu.id
+            id : this.props.menu.id,
+            sectionId: this.props.menu.section_id,
+            ownerId: localStorage.getItem('id')
         }
 
         fetch(`${backendURL}/restaurant/deleteMenu`, {

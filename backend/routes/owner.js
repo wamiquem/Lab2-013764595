@@ -144,10 +144,10 @@ router.post('/updatePassword',function(req,res){
 
 router.get('/firstName',function(req,res){
     console.log("Inside Owner First Name Get Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.body);
 
-    queries.getOwnerFirstNameById(req.cookies.cookie.id, row => {
-        res.status(200).json({success: true, firstName: row.fname});
+    queries.getOwnerFirstNameById(req.query.id, owner => {
+        res.status(200).json({success: true, firstName: owner.fname});
     }, err => {
         res.status(500).json({success: false, message: `Something wrong when reading buyer first name. ${err}`});
     })
@@ -155,10 +155,10 @@ router.get('/firstName',function(req,res){
 
 router.post('/updateProfile',function(req,res){
     console.log("Inside Owner Update Profile Post Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
 
-    queries.updateOwnerProfile(req.cookies.cookie.id, req.body, sqlresult => {
-        console.log("Number of records updated: " + sqlresult.affectedRows);
+    queries.updateOwnerProfile(req.query.id, req.body, doc => {
+        console.log("Owner profile updated succesfully");
         res.status(200).send({message:'Owner profile updated succesfully.'});    
     }, err => {
         res.status(500).json(`Something wrong when updating owner profile. ${err}`);
@@ -167,11 +167,10 @@ router.post('/updateProfile',function(req,res){
 
 router.get('/details',function(req,res){
     console.log("Inside Owner Details Get Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
  
-    queries.getOwnerDetailsById(req.cookies.cookie.id, row => {
-        res.status(200).json({success: true, firstName: row.fname, lastName: row.lname, phone: row.phone,
-            restName: row.rest_name, restZip: row.rest_zip});
+    queries.getOwnerDetailsById(req.query.id, owner => {
+        res.status(200).json({success: true, owner:owner});
     }, err => {
         res.status(200).json({success: false, message: `Something wrong when reading buyer first name. ${err}`});
     })
@@ -179,10 +178,10 @@ router.get('/details',function(req,res){
 
 router.get('/profilePic',function(req,res){
     console.log("Inside Owner profile pic Get Request");
-    console.log("Req Body : ",req.body);
+    console.log("Req Query : ",req.query);
  
-    queries.getOwnerImageNameById(req.cookies.cookie.id, row => {
-        res.sendFile(path.join(__dirname, `../uploads/${row.image}`));
+    queries.getOwnerImageNameById(req.query.ownerId, owner => {
+        res.sendFile(path.join(__dirname, `../uploads/${owner.image}`));
     }, err => {
         res.status(500).json({success: false, message: `Something wrong when reading owner image. ${err}`});
     })

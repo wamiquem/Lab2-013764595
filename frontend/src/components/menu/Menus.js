@@ -7,10 +7,11 @@ import backendURL from '../../urlconfig';
 class Menus extends Component {
     constructor(props){
         super(props);
-        this.getSectionsFromMenuFormComponent = this.getSectionsFromMenuFormComponent.bind(this);
+        // this.getSectionsFromMenuFormComponent = this.getSectionsFromMenuFormComponent.bind(this);
         this.handleEditChange = this.handleEditChange.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
         this.state = {
             menus: [],
             sections: []
@@ -32,6 +33,26 @@ class Menus extends Component {
           }))
     }
 
+    handleUpdate(menuId, newSectionId) {
+        this.setState(state => {
+            const menus = state.menus.map(menu => {
+                // Find a menu with the matching id
+                if(menu.id == menuId){
+                    //Return a new object
+                    return{
+                        ...menu, //copy the existing menu
+                        ["initial_section_id"]: newSectionId //replace the name with new name
+                    }
+                }
+                // Leave every other menu unchanged
+                return menu;
+            });
+            return {
+                menus
+            };
+        });
+    }
+
     handleEditChange(id, name, value) {
         this.setState(state => {
             const menus = state.menus.map(menu => {
@@ -51,34 +72,53 @@ class Menus extends Component {
             };
         });
     }
-
-    getSectionsFromMenuFormComponent = sections => {
-        this.setState({
-            sections : this.state.sections.concat(sections)
-        });
-    }
     
     componentDidMount(){
         // if(localStorage.getItem('token')){
-            fetch(`${backendURL}/restaurant/menus`,{
-                credentials: 'include'
-             })
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    menus : this.state.menus.concat(data.menus)
-                });
+        fetch(`${backendURL}/restaurant/menus/?ownerId=${localStorage.getItem('id')}`,{
+            credentials: 'include'
             })
-            .catch(err => console.log(err));
+        .then(res => res.json())
+        .then(data => {
+            let sections = data.sections.map(section => {
+                return{
+                    name: section.name,
+                    id: section._id
+                }
+            });
+            let sectionsWithMenus = data.sections.filter(section => section.menus);
+            let menus = sectionsWithMenus.map(section => {
+                let availableMenus = section.menus.map( menu => {
+                    return{
+                        initial_section_id: section._id,
+                        section_id: section._id,
+                        id: menu._id,
+                        name: menu.name,
+                        description: menu.description,
+                        price: menu.price,
+                        image: menu.image
+                    }
+                })
+                return availableMenus;
+            })
+            menus = menus.flat();
+            this.setState({
+                menus : this.state.menus.concat(menus),
+                sections: this.state.sections.concat(sections)
+            });
+        })
+        .catch(err => console.log(err));
     }    
 
     render(){
         return(
             <div>
-                <MenuAddForm onAdd = {this.handleAdd} onSectionsLoad = {this.getSectionsFromMenuFormComponent}/>
+                {/* <MenuAddForm onAdd = {this.handleAdd} onSectionsLoad = {this.getSectionsFromMenuFormComponent}/> */}
+                <MenuAddForm onAdd = {this.handleAdd} sections = {this.state.sections}/>
                 <MenusList menus = {this.state.menus} sections = {this.state.sections}
                 onDelete = {this.handleDelete}
-                onEditChange = {this.handleEditChange}/>
+                onEditChange = {this.handleEditChange}
+                onUpdate = {this.handleUpdate}/>
             </div>
             
         

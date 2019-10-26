@@ -26,6 +26,7 @@ class SectionAddForm extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = {
+            ownerId: localStorage.getItem('id'),
             name : this.state.name
         }
 
@@ -46,7 +47,7 @@ class SectionAddForm extends Component {
                     this.setState({
                         message: responseMessage
                     })
-                    this.props.onAdd({id: JSON.parse(data).id, rest_id: JSON.parse(data).restId, name: this.state.name});
+                    this.props.onAdd({id: JSON.parse(data).id, name: this.state.name});
                 });
             }else{
                 res.text().then(data => {

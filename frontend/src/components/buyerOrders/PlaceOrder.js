@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
 import Navbar from '../Navbar';
 import { Redirect, Link } from 'react-router-dom';
-import cookie from 'react-cookies';
 import Item from './Item'
 import backendURL from '../../urlconfig';
 
@@ -10,12 +9,16 @@ class PlaceOrder extends Component {
         super(props);
         this.cart = {
             restId: "",
+            restName: "",
+            ownerId: "",
             items: []
         };
         this.state = {
             sections: [],
             items: [],
             restId: props.match.params.restId,
+            restName: props.location.restName,
+            ownerId: props.location.ownerId,
             isCartEmpty: true
         }
         this.addToCart = this.addToCart.bind(this);
@@ -29,19 +32,33 @@ class PlaceOrder extends Component {
                 })
             .then(res => res.json())
             .then(data => {
-                this.setState({
-                    items : this.state.items.concat(data.items)
+                let sections = data.sections.map(section => {
+                    return{
+                        name: section.name,
+                        id: section._id
+                    }
                 });
-            })
-            .catch(err => console.log(err));
-
-            fetch(`${backendURL}/restaurant/sections/?restId=${this.state.restId}`,{
-                credentials: 'include'
+                let sectionsWithMenus = data.sections.filter(section => section.menus);
+                let items = sectionsWithMenus.map(section => {
+                    let availableMenus = section.menus.map( menu => {
+                        return{
+                            section_id: section._id,
+                            id: menu._id,
+                            name: menu.name,
+                            description: menu.description,
+                            price: menu.price,
+                            rest_id: this.state.restId,
+                            rest_name: this.state.restName,
+                            owner_id: this.state.ownerId,
+                            image: menu.image
+                        }
+                    })
+                    return availableMenus;
                 })
-            .then(res => res.json())
-            .then(data => {
+                items = items.flat();
                 this.setState({
-                    sections : this.state.sections.concat(data.sections)
+                    items : this.state.items.concat(items),
+                    sections : this.state.sections.concat(sections)
                 });
             })
             .catch(err => console.log(err));
@@ -56,9 +73,11 @@ class PlaceOrder extends Component {
 
     }
 
-    addToCart(restId, items){
+    addToCart(restId, restName, ownerId, items){
         if(this.cart.restId !== restId){
             this.cart.restId = restId;
+            this.cart.restName = restName;
+            this.cart.ownerId = ownerId;
             this.cart.items = items;
         } else {
             var itemExists = this.cart.items.findIndex(cartItem => cartItem.id === items[0].id);
@@ -79,7 +98,6 @@ class PlaceOrder extends Component {
     }
 
     render(){
-        console.log("this.state.iscartempt", this.state.isCartEmpty);
         let redirectVar = null;
         let fname = null;
         if(!localStorage.getItem('token')){

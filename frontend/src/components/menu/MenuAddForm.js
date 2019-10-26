@@ -9,7 +9,7 @@ class MenuAddForm extends Component {
         super(props);
         
         this.state = {
-            sections: [],
+            // sections: [],
             name: "",
             description: "",
             price: "",
@@ -23,22 +23,22 @@ class MenuAddForm extends Component {
         this.submitAdd = this.submitAdd.bind(this);
     }
 
-    componentDidMount(){
-        console.log("inside component mount");
-        if(localStorage.getItem('token')){
-            fetch(`${backendURL}/restaurant/sections`,{
-                credentials: 'include'
-             })
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    sections : this.state.sections.concat(data.sections)
-                });
-                this.props.onSectionsLoad(this.state.sections);
-            })
-            .catch(err => console.log(err));
-        }
-    }
+    // componentDidMount(){
+    //     console.log("inside component mount");
+    //     if(localStorage.getItem('token')){
+    //         fetch(`${backendURL}/restaurant/sections`,{
+    //             credentials: 'include'
+    //          })
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             this.setState({
+    //                 sections : this.state.sections.concat(data.sections)
+    //             });
+    //             this.props.onSectionsLoad(this.state.sections);
+    //         })
+    //         .catch(err => console.log(err));
+    //     }
+    // }
 
     //input change handler to update state variable with the text entered by the user
     changeHandler(e) {
@@ -57,7 +57,7 @@ class MenuAddForm extends Component {
     }
 
     postMenuData = (data,successcb) => {
-        fetch(`${backendURL}/restaurant/addMenu`, {
+        fetch(`${backendURL}/restaurant/addMenu/`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
@@ -68,17 +68,17 @@ class MenuAddForm extends Component {
         })
         .then(res => {
             if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
+                res.text().then(resData => {
+                    console.log(resData);
                     this.props.onAdd({
-                        id: JSON.parse(data).menuId, section_id: data.sectionId,rest_id: JSON.parse(data).restId, 
+                        id: JSON.parse(resData).menuId, section_id: data.sectionId, 
                         name: this.state.name, description: this.state.description, price: this.state.price
                     });
                     if(this.state.isNewImage){
-                        successcb(JSON.parse(data).message, JSON.parse(data).menuId);
+                        successcb(JSON.parse(resData).message, JSON.parse(resData).menuId, data.sectionId);
                     } else {
                         this.setState({
-                            message: JSON.parse(data).message
+                            message: JSON.parse(resData).message
                         })
                     }
                 });
@@ -101,19 +101,22 @@ class MenuAddForm extends Component {
         //prevent page from refresh
         e.preventDefault();
 
-        let section = this.state.sections.find(section => section.name === this.state.section);
+        let section = this.props.sections.find(section => section.name === this.state.section);
         const data = {
+            ownerId: localStorage.getItem('id'),
             sectionId: section.id,
             name : this.state.name,
             description: this.state.description,
             price: this.state.price
         }
 
-        this.postMenuData(data, (success, menuId) => {
+        this.postMenuData(data, (success, menuId, sectionId) => {
             if(this.state.isNewImage){
                 const formData = new FormData();
                 formData.append('image', document.querySelector('input[type="file"]').files[0]);
                 formData.append('menuId', menuId);
+                formData.append('sectionId', sectionId);
+                formData.append('ownerId', localStorage.getItem('id'));
                 
                 fetch(`${backendURL}/upload/menu-image`, {
                     method: 'POST',
@@ -165,7 +168,7 @@ class MenuAddForm extends Component {
                                             <div class="form-group">
                                                 <select class="form-control" name="section" onChange = {this.changeHandler}>
                                                     <option selected>Select Section</option>
-                                                    {this.state.sections.map((section) => (
+                                                    {this.props.sections.map((section) => (
                                                     <option>{section.name}</option>
                                                     ))}
                                                 </select>

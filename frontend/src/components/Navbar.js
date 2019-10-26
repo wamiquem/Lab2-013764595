@@ -34,7 +34,7 @@ class Navbar extends Component {
             }
             console.log("Able to read cookie");
             navLogin = (
-                <ul className="nav navbar-nav navbar-right">
+                <ul className="nav navbar-nav navbar-right ">
                     {navCart}
                     <li className="dropdown">
                         <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Hi,{this.props.firstName}!!! <span className="caret"></span></a>

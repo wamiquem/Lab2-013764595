@@ -1,32 +1,39 @@
 import React,{Component} from 'react';
 import backendURL from '../../urlconfig';
+import MessagesModal from '../messaging/MessagesModal';
 
 class NewOrder extends Component {
      constructor(props){
         super(props);
 
         this.state = {
-            // menuItems: [],
+            showMessages: false,
             status: ""
         }
         //Bind the handlers to this class
         this.handleEditChange = this.handleEditChange.bind(this);
         this.updateStatus = this.updateStatus.bind(this);
+        this.handleSendMessage = this.handleSendMessage.bind(this);
+        this.showMessageModal = this.showMessageModal.bind(this);
+        this.hideMessageModal = this.hideMessageModal.bind(this);
     }
 
-    // componentDidMount(){
-    //     fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
-    //             credentials: 'include'
-    //     })
-    //     .then(res => res.json())
-    //     .then(data => {
-    //         console.log(data);
-    //         this.setState({
-    //             menuItems: data.menuItems
-    //         })
-    //     })
-    //     .catch(err => console.log(err));
-    // }
+    showMessageModal = e => {
+        this.setState({
+            showMessages: true
+        });
+    }
+
+    hideMessageModal = e => {
+        this.setState({
+            showMessages: false
+        });
+    }
+
+    handleSendMessage(message){
+        console.log("New Orders Props called");
+        this.props.onSendMessage(message);
+    }
 
     updateStatus = (e) => {
         //prevent page from refresh
@@ -73,11 +80,9 @@ class NewOrder extends Component {
         this.setState({
             status: e.target.value
         })
-        // this.props.onEditChange(this.props.order.orderId, e.target);
     }
 
     render(){
-        console.log(this.state)
         let statuses = ['New', 'Preparing', 'Ready', 'Delivered', 'Cancel'];
         let itemDetails = this.props.order.items.map(item => {
             return(
@@ -96,6 +101,8 @@ class NewOrder extends Component {
                 <hr/>
                 <h2 style= {{color:"red"}}>{this.state.message}</h2>
                 <label style = {{fontSize:'17px'}}>Order# {this.props.order.id}</label>
+                <button style = {{marginLeft:'20px'}} onClick = {this.showMessageModal}
+                className="btn btn-primary btn-sm">View/Send Message</button>
                 <h5 style = {{textDecoration:'underline'}}>Buyer Details</h5>
                 <div style = {{display:'flex'}}>
                     <label>Buyer Name:</label>
@@ -129,6 +136,10 @@ class NewOrder extends Component {
                     <button onClick = {this.updateStatus}
                     className="btn btn-primary btn-status-change">Change Status</button>
                 </div>
+                {this.state.showMessages ? <MessagesModal 
+                orderId = {this.props.order.id} senderName={this.props.order.restName} 
+                messages = {this.props.order.messages} onSendMessage = {this.handleSendMessage}
+                hideMessageModal={this.hideMessageModal}/> : null} 
             </div>
         )
     }

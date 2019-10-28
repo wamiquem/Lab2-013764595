@@ -1,28 +1,33 @@
 import React,{Component} from 'react';
-import backendURL from '../../urlconfig';
+import MessagesModal from '../messaging/MessagesModal';
 
 class OldOrder extends Component {
      constructor(props){
         super(props);
 
-        // this.state = {
-        //     menuItems: []
-        // }
+        this.state = {
+            showMessages: false
+        }
+        this.handleSendMessage = this.handleSendMessage.bind(this);
+        this.showMessageModal = this.showMessageModal.bind(this);
+        this.hideMessageModal = this.hideMessageModal.bind(this);
     }
 
-    // componentDidMount(){
-    //     fetch(`${backendURL}/restaurant/orderedItems/${this.props.order.orderId}`,{
-    //             credentials: 'include'
-    //     })
-    //     .then(res => res.json())
-    //     .then(data => {
-    //         console.log(data);
-    //         this.setState({
-    //             menuItems: data.menuItems
-    //         })
-    //     })
-    //     .catch(err => console.log(err));
-    // }
+    showMessageModal = e => {
+        this.setState({
+            showMessages: true
+        });
+    }
+
+    hideMessageModal = e => {
+        this.setState({
+            showMessages: false
+        });
+    }
+
+    handleSendMessage(message){
+        this.props.onSendMessage(message);
+    }
 
     render(){
         let itemDetails = this.props.order.items.map(item => {
@@ -41,6 +46,8 @@ class OldOrder extends Component {
             <div>
                 <hr/>
                 <label style = {{fontSize:'17px'}}>Order# {this.props.order.id}</label>
+                <button style = {{marginLeft:'20px'}} onClick = {this.showMessageModal}
+                className="btn btn-primary btn-sm">View/Send Message</button>
                 <h5 style = {{textDecoration:'underline'}}>Buyer Details</h5>
                 <div style = {{display:'flex'}}>
                     <label>Buyer Name:</label>
@@ -57,7 +64,11 @@ class OldOrder extends Component {
                 <div style = {{display:'flex'}}>
                     <label>Order Status:</label>
                     <h7 style = {{paddingLeft:'5px'}}>{this.props.order.status}</h7>
-                </div>                
+                </div> 
+                {this.state.showMessages ? <MessagesModal 
+                orderId = {this.props.order.id} senderName={this.props.order.restName} 
+                messages = {this.props.order.messages} onSendMessage = {this.handleSendMessage}
+                hideMessageModal={this.hideMessageModal}/> : null}                
             </div>
         )
     }

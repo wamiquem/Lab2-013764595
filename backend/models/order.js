@@ -56,6 +56,22 @@ const orderSchema = mongoose.Schema({
                 required: true
             }
         }
+    ],
+    messages: [
+        {   
+            senderName: {
+                type: String,
+                required: true
+            },
+            text: {
+                type: String,
+                required: true
+            },
+            sentDate: {
+                type: String,
+                required: true
+            }
+        }
     ]
 });
 

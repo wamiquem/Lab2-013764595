@@ -544,3 +544,29 @@
   height: 100%; 
   width: 100%;
 }
+
+.modal {
+  display: block;
+}
+
+.msg-textarea{
+  width: 100%;
+  position: sticky;
+  bottom: 0
+}
+
+.modal-body {
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+}
+
+.msg-text{
+  white-space: pre-wrap;
+  border-radius: 3px;
+  padding-left: 10px
+}
+
+.msg-info{
+  margin-bottom: 0;
+  font-style: italic
+}

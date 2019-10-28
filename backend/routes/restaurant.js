@@ -242,8 +242,21 @@ router.post('/updateProfile',function(req,res){
         console.log("Restaurant profile updated succesfully");
         res.status(200).send({message:'Restaurant profile updated succesfully.'});    
     }, err => {
-        res.status(500).json(`Something wrong when updating restaurant profile. ${err}`);
+        res.status(500).send({ message: `Something wrong when updating restaurant profile. ${err.message}`});
     });
+});
+
+router.post('/addMessage',function(req,res){
+    console.log("Inside Restaurant Add Message Post Request");
+    console.log("Req Body : ",req.body);
+    const message = req.body;
+
+    queries.addMessage(message, responseMessage => {
+        console.log("Message added successfully");
+        res.status(200).send({message: responseMessage});
+    }, err => {
+        res.status(500).send({ message: `Something failed when adding message to the order. ${err.message}`});
+    })
 });
 
 module.exports = router;

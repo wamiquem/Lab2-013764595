@@ -707,4 +707,17 @@ queries.getRestaurantImageNameById = (restaurantId, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
+queries.addMessage = (message, successcb, failurecb) => {
+    Order.findOne({id: message.orderId})
+    .then(order => {
+        order.messages.push(message);
+        order.save()
+        .then(doc => {
+            successcb("Message added successfully")
+        })
+        .catch(err => failurecb(err))
+    })
+    .catch(err => failurecb(err))
+}
+
 module.exports = queries;

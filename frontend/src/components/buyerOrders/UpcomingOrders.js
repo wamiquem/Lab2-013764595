@@ -13,6 +13,7 @@ class UpcomingOrders extends Component {
         this.state = {
             orders: []
         }
+        this.handleSendMessage = this.handleSendMessage.bind(this);
     }
 
     //get the first name of owner from backend  
@@ -29,6 +30,25 @@ class UpcomingOrders extends Component {
             })
             .catch(err => console.log(err));
         }
+    }
+
+    handleSendMessage(message){
+        this.setState(state => {
+            const orders = state.orders.map(order => {
+                // Find a menu with the matching id
+                if(order.id == message.orderId){
+                    //Return a new object
+                    let orderToUpdate = {...order}
+                    orderToUpdate.messages = orderToUpdate.messages.concat(message);
+                    return orderToUpdate;
+                }
+                // Leave every other menu unchanged
+                return order;
+            });
+            return {
+                orders
+            };
+        });
     }
     
     render(){
@@ -51,7 +71,7 @@ class UpcomingOrders extends Component {
                                 {
                                     this.state.orders ? 
                                     this.state.orders.map(order => {
-                                        return <Order order = {order}/>
+                                        return <Order order = {order} onSendMessage = {this.handleSendMessage}/>
                                     })
                                     :
                                     <span/>

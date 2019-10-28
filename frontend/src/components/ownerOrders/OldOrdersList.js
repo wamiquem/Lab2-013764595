@@ -4,7 +4,12 @@ import OldOrder from './OldOrder';
 class OldOrdersList extends Component {
      constructor(props){
         super(props);
-        }
+        this.handleSendMessage = this.handleSendMessage.bind(this);
+    }
+
+    handleSendMessage(message){
+        this.props.onSendMessage(message);
+    }
 
     render(){
         return(
@@ -17,7 +22,7 @@ class OldOrdersList extends Component {
                                 {
                                     this.props.orders ? 
                                         this.props.orders.map(order => {
-                                            return <OldOrder order = {order}/>
+                                            return <OldOrder order = {order} onSendMessage = {this.handleSendMessage}/>
                                         })
                                     : <span/>
                                 }

@@ -23,23 +23,6 @@ class MenuAddForm extends Component {
         this.submitAdd = this.submitAdd.bind(this);
     }
 
-    // componentDidMount(){
-    //     console.log("inside component mount");
-    //     if(localStorage.getItem('token')){
-    //         fetch(`${backendURL}/restaurant/sections`,{
-    //             credentials: 'include'
-    //          })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             this.setState({
-    //                 sections : this.state.sections.concat(data.sections)
-    //             });
-    //             this.props.onSectionsLoad(this.state.sections);
-    //         })
-    //         .catch(err => console.log(err));
-    //     }
-    // }
-
     //input change handler to update state variable with the text entered by the user
     changeHandler(e) {
         this.setState({

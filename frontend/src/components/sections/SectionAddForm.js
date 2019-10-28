@@ -62,6 +62,7 @@ class SectionAddForm extends Component {
         })
         .catch(err => console.log(err));
     }
+    
     render(){
         //if Cookie is not set render Owner Login Page
         let redirectVar = null;

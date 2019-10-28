@@ -15,6 +15,26 @@ class OwnerHome extends Component {
             firstName: "",
             orders: []
         }
+        this.handleSendMessage = this.handleSendMessage.bind(this);
+    }
+
+    handleSendMessage(message){
+        this.setState(state => {
+            const orders = state.orders.map(order => {
+                // Find a menu with the matching id
+                if(order.id == message.orderId){
+                    //Return a new object
+                    let orderToUpdate = {...order}
+                    orderToUpdate.messages = orderToUpdate.messages.concat(message);
+                    return orderToUpdate;
+                }
+                // Leave every other menu unchanged
+                return order;
+            });
+            return {
+                orders
+            };
+        });
     }
 
     //get the first name of owner from backend  
@@ -51,8 +71,8 @@ class OwnerHome extends Component {
             <div>
                 {redirectVar}
                 <Navbar firstName = {fname} />
-                <NewOrdersList orders = {newOrders}/>
-                <OldOrdersList orders = {oldOrders}/>
+                <NewOrdersList orders = {newOrders} onSendMessage = {this.handleSendMessage}/>
+                <OldOrdersList orders = {oldOrders} onSendMessage = {this.handleSendMessage}/>
             </div>
         )
     }

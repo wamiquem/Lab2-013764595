@@ -160,7 +160,7 @@ router.post('/deleteMenu',function(req,res){
 });
 
 router.post('/updateMenu',function(req,res){
-    console.log("Inside Restaurant Update Section Post Request");
+    console.log("Inside Restaurant Update Menu Post Request");
     console.log("Req Body : ",req.body);
     const menu = req.body;
 

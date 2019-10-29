@@ -13,16 +13,21 @@ class BuyerSearch extends Component {
         //maintain the state required for this component
         this.state = {
             firstName: "",
-            restaurants: null,
+            restaurants: [],
             menuItem: props.match.params.menuItem,
             dropdown: false,
             cuisines: null,
             cuisineName: "",
             filteredCuisine: "",
-            initialrestaurants: null
+            initialrestaurants: [],
+            startIdx: 0,
+            endIdx:2,
+            curPage: 1,
+            restaurantsPerPage: 3
         }
         this.searchRestaurants = this.searchRestaurants.bind(this);
         this.changeHandler = this.changeHandler.bind(this);
+        this.paginationHandler = this.paginationHandler.bind(this);
     }
 
     //get the first name of buyer from backend  
@@ -60,23 +65,53 @@ class BuyerSearch extends Component {
     }
 
     handleEditChange = e => {
-        this.state.restaurants = this.state.initialrestaurants;
-        const filteredRestaurants = this.state.restaurants.filter(function (restaurant) {
+        // this.state.restaurants = this.state.initialrestaurants;
+        const filteredRestaurants = this.state.initialrestaurants.filter(function (restaurant) {
             return restaurant.cuisine === e.target.value;
           });
         if (e.target.value === 'Filter Cuisine') {
             this.setState({
-                restaurants: this.state.initialrestaurants
+                restaurants: this.state.initialrestaurants,
+                startIdx: 0,
+                endIdx:2,
+                curPage: 1
             })
         } else {
             this.setState({
-            restaurants: filteredRestaurants
+            restaurants: filteredRestaurants,
+            startIdx: 0,
+            endIdx:2,
+            curPage: 1
         })
         }
         
     }
 
+
+    paginationHandler(event) {
+        if (event.target.id === "prev") {
+            if (this.state.startIdx > 0) {
+                let startIdx = this.state.startIdx - this.state.restaurantsPerPage;
+                this.setState({
+                    curPage: this.state.curPage - 1,
+                    startIdx: startIdx,
+                    endIdx: startIdx + this.state.restaurantsPerPage - 1
+                });
+            } 
+        } else {
+            if(this.state.endIdx < this.state.restaurants.length - 1){
+                let startIdx = this.state.startIdx + this.state.restaurantsPerPage;
+                this.setState({
+                    curPage: this.state.curPage + 1,
+                    startIdx: startIdx,
+                    endIdx: startIdx + this.state.restaurantsPerPage - 1
+                });
+            }
+        }
+    }
+
     render(){
+        console.log("this.state***==== ", this.state);
         const isRestaurants = this.state.restaurants;
         const initialrestaurants = this.state.initialrestaurants;
         const result = [];
@@ -109,9 +144,9 @@ class BuyerSearch extends Component {
                 <Navbar firstName = {fname} />
                 <div>
                 <div className="container">
-                    <div className="owner-order-list">
-                        <div className="main-div">
-                            <div className="panel">
+                    {/* <div className="owner-order-list"> */}
+                        {/* <div className="main-div"> */}
+                            {/* <div className="panel"> */}
                                 <h1 className="display-1">Restaurants</h1>
                                 <hr/>
 
@@ -137,34 +172,52 @@ class BuyerSearch extends Component {
                                             </select>
                                         
                                 </div>
+                                <div className = "paginate">
+                                    <button className = "btn btn-primary btn-sm" id="prev" onClick={this.paginationHandler}>&lt;</button>
+                                    <button disabled className = "btn btn-primary btn-sm" id="curr">
+                                    {this.state.curPage}/{Math.ceil(this.state.restaurants.length/this.state.restaurantsPerPage)}</button>
+                                    <button className = "btn btn-primary btn-sm" id="next" onClick={this.paginationHandler}>&gt;</button>
+                                    <hr/>
+                                </div>
                                 <div>
                                 {   
                                     isRestaurants 
-                                            ?
-                                            this.state.restaurants.map(restaurant => {
-                                                return (
-                                                    <div className="container buyerSearList">
-                                                        <Link to={{ pathname: `/buyer/place-order/${restaurant._id}`, restName: restaurant.name, ownerId: restaurant.owner_id}}>
-                                                        <div class="row  listrow"> 
-                                                            <div class="col-md-4 buyer-menu-image">
-                                                                <img className="rounded float-left img-thumbnail" src = {`${backendURL}/buyer/restaurantImage/${restaurant._id}`} alt="Responsive image"></img>
-                                                            </div>
-                                                            <div class="col-md-8">
-                                                                <h3>{restaurant.name}</h3>
-                                                                <span>{restaurant.city} {restaurant.stree} {restaurant.state}</span>
-                                                            </div>
-                                                        </div>
-                                                        </Link>
+                                    ?
+                                    this.state.restaurants.filter(restaurant => {
+                                        let index = this.state.restaurants.indexOf(restaurant);
+                                        return index >= this.state.startIdx && index <= this.state.endIdx;
+                                    }).map(restaurant => {
+                                        return (
+                                            <div className="container buyerSearList">
+                                                <Link to={{ pathname: `/buyer/place-order/${restaurant._id}`, restName: restaurant.name, ownerId: restaurant.owner_id}}>
+                                                <div class="row  listrow"> 
+                                                    <div class="col-md-4 buyer-menu-image">
+                                                        <img className="rounded float-left img-thumbnail" src = {`${backendURL}/buyer/restaurantImage/${restaurant._id}`} alt="Responsive image"></img>
                                                     </div>
-                                                )
-                                            })
-                                            : <span/>
+                                                    <div class="col-md-8">
+                                                        <h4>{restaurant.name}</h4>
+                                                        <span>{restaurant.city} {restaurant.street} {restaurant.state}</span>
+                                                        <div>
+                                                            <span>{restaurant.cuisine}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                </Link>
+                                                <hr/>
+                                            </div>
+                                        )
+                                    })
+                                    : <span/>
                                         }
                                 </div>
+                                <div className = "paginate">
+                                    <button className = "btn btn-primary btn-sm" id="prev" onClick={this.paginationHandler}>&lt;</button>
+                                    <button disabled className = "btn btn-primary btn-sm" id="curr">
+                                    {this.state.curPage}/{Math.ceil(this.state.restaurants.length/this.state.restaurantsPerPage)}</button>
+                                    <button className = "btn btn-primary btn-sm" id="next" onClick={this.paginationHandler}>&gt;</button>
+                                    <hr/>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
                 </div>
             </div>
         )

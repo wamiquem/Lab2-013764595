@@ -522,11 +522,11 @@
 }
 
 .buyerSearList {
-  padding: 15px;
+  padding: 0
 }
 .listrow {
-  border: 1px solid #ddd!important;
-  max-width: 80%;
+  /* border: 1px solid #ddd!important; */
+  max-width: 80%
 }
 
 .buyerInput {
@@ -535,14 +535,15 @@
 }
 
 .buyer-menu-image {
-  height: 200px; 
-  width: 200px;
-  padding-left: 10px;
+  height: 100px; 
+  width: 150px;
+  padding-left: 0;
 }
 
 .buyer-menu-image .img-thumbnail{
   height: 100%; 
   width: 100%;
+  padding: 0
 }
 
 .modal {
@@ -569,4 +570,14 @@
 .msg-info{
   margin-bottom: 0;
   font-style: italic
+}
+
+.paginate{
+  text-align: center;
+  padding-top: 10px
+}
+
+.paginate .btn{
+  margin: 2px;
+  opacity: 1
 }

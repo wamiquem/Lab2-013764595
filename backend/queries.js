@@ -526,7 +526,7 @@ queries.updateMenu = (menu, successcb, failurecb) => {
     Restaurant.findOne({owner_id: menu.ownerId})
     .then(restaurant => {
         if(menu.initialSectionId === menu.newSectionId){
-            let menuExists = restaurant.sections.id(menu.newSectionId).menus.find(existingMenu => existingMenu.name === menu.name);
+            let menuExists = restaurant.sections.id(menu.newSectionId).menus.find(existingMenu => existingMenu.name === menu.name && !existingMenu._id.equals(menu.id));
             if(menuExists){
                 var error =  new Error('Menu with same name already exists.');
                 error.code = "DUPLICATE_MENU";

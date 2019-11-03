@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import backendURL from '../urlconfig';
 
 //create the Owner Profile Component
@@ -29,7 +28,13 @@ class RestaurantProfile extends Component {
 
     componentDidMount(){
         if(localStorage.getItem('token')){
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/restaurant/details/?ownerId=${localStorage.getItem('id')}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 credentials: 'include'
              })
             .then(res => res.json())
@@ -47,6 +52,11 @@ class RestaurantProfile extends Component {
             .catch(err => console.log(err));
 
             fetch(`${backendURL}/restaurant/profilePic/?ownerId=${localStorage.getItem('id')}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -92,8 +102,12 @@ class RestaurantProfile extends Component {
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
         formData.append('ownerId', localStorage.getItem('id'));
         
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/upload/restaurant-profile-image`, {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             credentials: 'include',
             body: formData
         })
@@ -121,11 +135,13 @@ class RestaurantProfile extends Component {
     updateProfile = (e) => {
         e.preventDefault();
         const data = this.state;
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/updateProfile/?ownerId=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

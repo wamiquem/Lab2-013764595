@@ -22,7 +22,13 @@ class Menu extends Component {
 
     componentDidMount(){
         // fetch(`${backendURL}/restaurant/menuImage/${this.props.menu.id}`,{
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/restaurant/menuImage/?name=${this.props.menu.image}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -69,11 +75,13 @@ class Menu extends Component {
     }
 
     postMenuData = (data,successcb) => {
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/updateMenu`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)
@@ -127,9 +135,13 @@ class Menu extends Component {
             formData.append('menuId', this.props.menu.id);
             formData.append('sectionId', this.props.menu.section_id);
             formData.append('ownerId', localStorage.getItem('id'));
-            
+
+            const token = localStorage.getItem('token');            
             fetch(`${backendURL}/upload/menu-image`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 credentials: 'include',
                 body: formData
             })
@@ -153,12 +165,13 @@ class Menu extends Component {
             sectionId: this.props.menu.section_id,
             ownerId: localStorage.getItem('id')
         }
-
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/deleteMenu`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

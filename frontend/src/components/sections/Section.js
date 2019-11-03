@@ -42,11 +42,13 @@ class Section extends Component {
             name : this.props.section.name
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/updateSection`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)
@@ -83,11 +85,13 @@ class Section extends Component {
             id : this.props.section._id
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/deleteSection`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

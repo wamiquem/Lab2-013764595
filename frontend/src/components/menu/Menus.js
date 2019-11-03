@@ -75,7 +75,13 @@ class Menus extends Component {
     
     componentDidMount(){
         // if(localStorage.getItem('token')){
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/menus/?ownerId=${localStorage.getItem('id')}`,{
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             credentials: 'include'
             })
         .then(res => res.json())

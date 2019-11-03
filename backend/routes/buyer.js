@@ -45,7 +45,7 @@ router.post('/login',function(req,res){
     });
 });
 
-router.post('/updateAddress',function(req,res){
+router.post('/updateAddress',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Buyer Update Address Post Request");
     console.log("Req Query : ",req.query);
 
@@ -61,7 +61,7 @@ router.post('/updateAddress',function(req,res){
     });
 });
 
-router.post('/updateProfile',function(req,res){
+router.post('/updateProfile',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Buyer Update Profile Post Request");
     console.log("Req Query : ",req.query);
 
@@ -77,7 +77,7 @@ router.post('/updateProfile',function(req,res){
     });
 });
 
-router.get('/firstName',function(req,res){
+router.get('/firstName',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside buyer First Name Get Request");
     console.log("Req Query : ",req.query);
  
@@ -91,7 +91,7 @@ router.get('/firstName',function(req,res){
     });
 });
 
-router.get('/details',function(req,res){
+router.get('/details',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside buyer Details Get Request");
     console.log("Req Query : ",req.query);
  
@@ -105,7 +105,7 @@ router.get('/details',function(req,res){
     });
 });
 
-router.get('/profilePic',function(req,res){
+router.get('/profilePic',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside buyer profile pic Get Request");
     console.log("Req Query : ",req.query);
  
@@ -134,7 +134,7 @@ router.get('/searchRestaurants',passport.authenticate("jwt", { session: false })
     });
 });
 
-router.post('/placeOrder',function(req,res){
+router.post('/placeOrder',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Buyer Place Order Post Request");
     console.log("Req Body : ",req.body);
     
@@ -149,7 +149,7 @@ router.post('/placeOrder',function(req,res){
     });
 });
 
-router.get('/upcomingOrders',function(req,res){
+router.get('/upcomingOrders',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Buyer Upcoming Orders Get Request");
     console.log("Req Query : ",req.query);
     
@@ -163,7 +163,7 @@ router.get('/upcomingOrders',function(req,res){
     });
 });
 
-router.get('/pastOrders',function(req,res){
+router.get('/pastOrders',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Buyer Past Orders Get Request");
     console.log("Req Query : ",req.query);
     

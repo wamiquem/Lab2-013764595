@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const path = require('path');
 const {secret} = require('../config/config');
+var passport = require("passport");
 var jwt = require("jsonwebtoken");
 var kafka = require('../kafka/client');
 
@@ -45,7 +46,7 @@ router.post('/login',function(req,res){
     });
 });
 
-router.get('/firstName',function(req,res){
+router.get('/firstName',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Owner First Name Get Request");
     console.log("Req Query : ",req.body);
 
@@ -59,7 +60,7 @@ router.get('/firstName',function(req,res){
     });
 });
 
-router.post('/updateProfile',function(req,res){
+router.post('/updateProfile',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Owner Update Profile Post Request");
     console.log("Req Query : ",req.query);
 
@@ -75,7 +76,7 @@ router.post('/updateProfile',function(req,res){
     });
 });
 
-router.get('/details',function(req,res){
+router.get('/details',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Owner Details Get Request");
     console.log("Req Query : ",req.query);
  
@@ -89,7 +90,7 @@ router.get('/details',function(req,res){
     });
 });
 
-router.get('/profilePic',function(req,res){
+router.get('/profilePic',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Owner profile pic Get Request");
     console.log("Req Query : ",req.query);
  
@@ -103,7 +104,7 @@ router.get('/profilePic',function(req,res){
     });
 });
 
-router.post('/addRestaurant',function(req,res){
+router.post('/addRestaurant',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside add Restaurant Post Request");
     console.log("Req Body : ",req.body);
     const restaurant = req.body;

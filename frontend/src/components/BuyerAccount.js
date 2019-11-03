@@ -1,6 +1,5 @@
 import React,{Component} from 'react';
 import { Switch, Route } from 'react-router-dom';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';

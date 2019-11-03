@@ -4,7 +4,6 @@ import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
 import food from '../images/food.jpeg'
-import backendURL from '../urlconfig';
 
 //create the Navbar Component
 class BuyerHome extends Component {

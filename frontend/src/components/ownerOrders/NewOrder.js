@@ -42,12 +42,14 @@ class NewOrder extends Component {
             id : this.props.order.id,
             status : this.state.status
         }
-
+        
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/updateOrder`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

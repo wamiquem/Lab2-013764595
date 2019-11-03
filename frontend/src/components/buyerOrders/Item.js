@@ -16,8 +16,14 @@ class Item extends Component {
     }
 
     componentDidMount(){
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/menuImage/?name=${this.props.item.image}`,{
-                credentials: 'include'
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+            credentials: 'include'
             })
             .then(res => res.blob())
             .then(resAsBlob => {

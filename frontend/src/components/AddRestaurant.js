@@ -60,11 +60,13 @@ class AddRestaurant extends Component {
             cuisine: this.state.cuisine
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/owner/addRestaurant`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

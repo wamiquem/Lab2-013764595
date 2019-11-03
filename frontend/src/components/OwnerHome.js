@@ -40,8 +40,14 @@ class OwnerHome extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/restaurant/allOrders/?ownerId=${localStorage.getItem('id')}`,{
-            credentials: 'include'
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {                

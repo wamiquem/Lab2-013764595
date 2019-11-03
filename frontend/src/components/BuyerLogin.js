@@ -1,6 +1,5 @@
 import React,{Component} from 'react';
 import {Link} from 'react-router-dom';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
 import backendURL from '../urlconfig';
@@ -53,11 +52,13 @@ class BuyerLogin extends Component {
             password : this.state.password
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/buyer/login`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

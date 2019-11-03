@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 var path = require('path');
-const queries = require('../../kafka-backend/utils/queries');
 var kafka = require('../kafka/client');
-// const con = require('../dbconnection');
+var passport = require("passport");
+var jwt = require("jsonwebtoken");
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -17,7 +17,7 @@ var storage = multer.diskStorage({
   
 var upload = multer({ storage: storage }).single('image');
 
-router.post('/buyer-profile-image', (req, res) => {
+router.post('/buyer-profile-image', passport.authenticate("jwt", { session: false }),(req, res) => {
     console.log("Inside buyer profile pic post Request");
 
     upload(req, res, function(err){
@@ -42,7 +42,7 @@ router.post('/buyer-profile-image', (req, res) => {
     });
 });
 
-router.post('/owner-profile-image', (req, res) => {
+router.post('/owner-profile-image', passport.authenticate("jwt", { session: false }),(req, res) => {
     console.log("Inside owner profile pic post Request");
 
     upload(req, res, function(err){
@@ -67,7 +67,7 @@ router.post('/owner-profile-image', (req, res) => {
     });
 });
 
-router.post('/restaurant-profile-image', (req, res) => {
+router.post('/restaurant-profile-image', passport.authenticate("jwt", { session: false }),(req, res) => {
     upload(req, res, function(err){
         if(err){
             res.status(500).send({message: `Restaurant Image upload failed due to internal issue. ${err}`});
@@ -90,7 +90,7 @@ router.post('/restaurant-profile-image', (req, res) => {
     });
 });
 
-router.post('/menu-image', (req, res) => {
+router.post('/menu-image', passport.authenticate("jwt", { session: false }),(req, res) => {
     upload(req, res, function(err){
         if(err){
             res.status(500).send({message: `Menu Image upload failed due to internal issue. ${err}`});

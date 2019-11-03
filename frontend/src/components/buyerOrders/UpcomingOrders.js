@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import backendURL from '../../urlconfig';
 import Order from './Order';
@@ -19,8 +18,14 @@ class UpcomingOrders extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/buyer/upcomingOrders/?id=${localStorage.getItem('id')}`,{
-            credentials: 'include'
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {                

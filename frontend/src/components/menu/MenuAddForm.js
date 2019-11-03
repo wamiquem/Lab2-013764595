@@ -40,11 +40,13 @@ class MenuAddForm extends Component {
     }
 
     postMenuData = (data,successcb) => {
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/addMenu/`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)
@@ -101,8 +103,12 @@ class MenuAddForm extends Component {
                 formData.append('sectionId', sectionId);
                 formData.append('ownerId', localStorage.getItem('id'));
                 
+                const token = localStorage.getItem('token');
                 fetch(`${backendURL}/upload/menu-image`, {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                      },
                     credentials: 'include',
                     body: formData
                 })

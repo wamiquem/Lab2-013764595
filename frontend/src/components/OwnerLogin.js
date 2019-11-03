@@ -52,11 +52,13 @@ class OwnerLogin extends Component {
             password : this.state.password
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/owner/login`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

@@ -46,7 +46,7 @@ class BuyerSearch extends Component {
                 Accept: 'application/json',
                 'Authorization': `Bearer ${token}`
               },
-            credentials: 'include',
+            credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {

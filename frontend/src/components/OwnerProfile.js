@@ -26,7 +26,13 @@ class OwnerProfile extends Component {
     
     componentDidMount(){
         if(localStorage.getItem('token')){
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/owner/details/?id=${localStorage.getItem('id')}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 credentials: 'include'
              })
             .then(res => res.json())
@@ -42,6 +48,11 @@ class OwnerProfile extends Component {
             .catch(err => console.log(err));
 
             fetch(`${backendURL}/owner/profilePic/?id=${localStorage.getItem('id')}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 credentials: 'include'
             })
             .then(res => res.blob())
@@ -87,8 +98,12 @@ class OwnerProfile extends Component {
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
         formData.append('id', localStorage.getItem('id'));
         
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/upload/owner-profile-image`, {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             credentials: 'include',
             body: formData
         })
@@ -116,11 +131,13 @@ class OwnerProfile extends Component {
     updateProfile = (e) => {
         e.preventDefault();
         const data = this.state;
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/owner/updateProfile/?id=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

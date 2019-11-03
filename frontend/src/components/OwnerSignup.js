@@ -57,11 +57,13 @@ class OwnerSignup extends Component {
             phone: this.state.phone
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/owner/signup`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

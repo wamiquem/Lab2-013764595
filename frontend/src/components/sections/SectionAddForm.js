@@ -30,11 +30,13 @@ class SectionAddForm extends Component {
             name : this.state.name
         }
 
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/restaurant/addSection`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

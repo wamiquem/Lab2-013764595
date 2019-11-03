@@ -1,7 +1,5 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
-import { Link} from 'react-router-dom';
 import Navbar from '../Navbar';
 import backendURL from '../../urlconfig';
 
@@ -26,7 +24,13 @@ class Checkout extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         if(localStorage.getItem('token')){
+            const token = localStorage.getItem('token');
             fetch(`${backendURL}/buyer/details/?id=${localStorage.getItem('id')}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
                 credentials: 'include'
              })
             .then(res => res.json())
@@ -56,11 +60,13 @@ class Checkout extends Component {
         //prevent page from refresh
         e.preventDefault();
         const data = this.state;
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/buyer/updateAddress/?id=${localStorage.getItem('id')}`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)
@@ -99,11 +105,13 @@ class Checkout extends Component {
             items: this.props.location.state.items,
             totalPrice: this.props.location.totalPrice
         }
+        const token = localStorage.getItem('token');
         fetch(`${backendURL}/buyer/placeOrder`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             credentials: 'include',
             body: JSON.stringify(data)

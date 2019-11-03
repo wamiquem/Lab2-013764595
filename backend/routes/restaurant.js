@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const path = require('path');
 var kafka = require('../kafka/client');
+var passport = require("passport");
+var jwt = require("jsonwebtoken");
 
 router.post('/create',function(req,res){
     console.log("Inside Create Restaurant Post Request");
@@ -18,7 +20,7 @@ router.post('/create',function(req,res){
     });
 });
 
-router.post('/addSection',function(req,res){
+router.post('/addSection',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Add Section Post Request");
     console.log("Req Body : ",req.body);
     const section = req.body;
@@ -33,7 +35,7 @@ router.post('/addSection',function(req,res){
     });
 });
 
-router.get('/sections',function(req,res){
+router.get('/sections',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Sections Get Request");
     console.log("Req Query : ",req.query);
 
@@ -53,7 +55,7 @@ router.get('/sections',function(req,res){
     });
 });
 
-router.post('/deleteSection',function(req,res){
+router.post('/deleteSection',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Delete Section Post Request");
     console.log("Req Body : ",req.body);
     const section = req.body;
@@ -68,7 +70,7 @@ router.post('/deleteSection',function(req,res){
     });
 });
 
-router.post('/updateSection',function(req,res){
+router.post('/updateSection',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Update Section Post Request");
     console.log("Req Body : ",req.body);
     const section = req.body;
@@ -83,7 +85,7 @@ router.post('/updateSection',function(req,res){
     });
 });
 
-router.post('/addMenu',function(req,res){
+router.post('/addMenu',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Add Menu Post Request");
     console.log("Req Body : ",req.body);
     const menu = req.body;
@@ -98,7 +100,7 @@ router.post('/addMenu',function(req,res){
     });
 });
 
-router.get('/menus',function(req,res){
+router.get('/menus',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Menus Get Request");
     console.log("Req Query : ",req.query);
     
@@ -112,7 +114,7 @@ router.get('/menus',function(req,res){
     });
 });
 
-router.get('/menuItems/:restId',function(req,res){
+router.get('/menuItems/:restId',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Menu Items Get Request");
     console.log("Req Params : ",req.params);
 
@@ -127,14 +129,14 @@ router.get('/menuItems/:restId',function(req,res){
     });
 });
 
-router.get('/menuImage',function(req,res){
+router.get('/menuImage',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Menus pic Get Request");
     console.log("Req Query : ",req.query);
     
     res.sendFile(path.join(__dirname, `../uploads/${req.query.name}`));
 });
 
-router.post('/deleteMenu',function(req,res){
+router.post('/deleteMenu',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Delete Menu Post Request");
     console.log("Req Body : ",req.body);
     const menu = req.body;
@@ -149,7 +151,7 @@ router.post('/deleteMenu',function(req,res){
     });
 });
 
-router.post('/updateMenu',function(req,res){
+router.post('/updateMenu',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Update Menu Post Request");
     console.log("Req Body : ",req.body);
     const menu = req.body;
@@ -164,7 +166,7 @@ router.post('/updateMenu',function(req,res){
     });
 });
 
-router.get('/allOrders',function(req,res){
+router.get('/allOrders',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant All Orders Get Request");
     console.log("Req Query : ",req.query);
     
@@ -178,7 +180,7 @@ router.get('/allOrders',function(req,res){
     });
 });
 
-router.post('/updateOrder',function(req,res){
+router.post('/updateOrder',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Update Order Post Request");
     console.log("Req Body : ",req.body);
     const order = req.body;
@@ -193,7 +195,7 @@ router.post('/updateOrder',function(req,res){
     });
 });
 
-router.get('/details',function(req,res){
+router.get('/details',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Details Get Request");
     console.log("Req Query : ",req.query);
 
@@ -207,7 +209,7 @@ router.get('/details',function(req,res){
     });
 });
 
-router.get('/profilePic',function(req,res){
+router.get('/profilePic',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside restaurant profile pic Get Request");
     console.log("Req Query : ",req.query);
 
@@ -221,7 +223,7 @@ router.get('/profilePic',function(req,res){
     });
 });
 
-router.post('/updateProfile',function(req,res){
+router.post('/updateProfile',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside restaurant Update Profile Post Request");
     console.log("Req Query : ",req.query);
 
@@ -238,7 +240,7 @@ router.post('/updateProfile',function(req,res){
     });
 });
 
-router.post('/addMessage',function(req,res){
+router.post('/addMessage',passport.authenticate("jwt", { session: false }),function(req,res){
     console.log("Inside Restaurant Add Message Post Request");
     console.log("Req Body : ",req.body);
     const message = req.body;

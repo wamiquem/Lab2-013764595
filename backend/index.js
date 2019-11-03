@@ -4,8 +4,7 @@ var cors = require('cors');
 var passport = require("passport");
 var bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const {database, frontendURL} = require('./config/config');
-var mongoose = require('mongoose');
+const {frontendURL} = require('./config/config');
 
 var buyer = require('./routes/buyer');
 var owner = require('./routes/owner');
@@ -27,22 +26,6 @@ app.use(function(req, res, next) {
   });
 
 app.use(bodyParser.json());
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(database, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false
-    });
-    console.log("MongoDB connected successfully");
-  } catch (err) {
-    console.log("Could not connect to MongoDB", err);
-  }
-};
-connectDB();
-
 
 app.use('/buyer', buyer);
 app.use('/owner', owner);

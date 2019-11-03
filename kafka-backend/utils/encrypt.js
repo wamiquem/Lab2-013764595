@@ -4,6 +4,7 @@ var bcrypt = require('bcrypt');
 const encrypt = {};
 
 encrypt.generateHash = (password, successcb, failurecb) => {
+    console.log("Generating hash");
     const saltRounds = 10;
     bcrypt.genSalt(saltRounds, function(err, salt) {
         if(err){

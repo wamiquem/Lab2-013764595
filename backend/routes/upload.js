@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var multer = require('multer');
 var path = require('path');
-var queries = require('../queries');
+const queries = require('../../kafka-backend/utils/queries');
+var kafka = require('../kafka/client');
 // const con = require('../dbconnection');
 
 var storage = multer.diskStorage({
@@ -21,14 +22,22 @@ router.post('/buyer-profile-image', (req, res) => {
 
     upload(req, res, function(err){
         if(err){
-            res.status(500).send({message: `Buyer Image uploaded failed due to internal issue. ${err}`});
+            res.status(500).send({message: `Buyer Image upload failed due to internal issue. ${err}`});
             return;
         }
-        queries.updateBuyerImage({id: req.body.id, image: req.file.filename}, doc => {
-            console.log("Buyer image updated succesfully");
-            res.status(200).send({message:'Buyer image updated succesfully.'});    
-        }, err => {
-            res.status(500).send({message: `Something wrong when updating owner image in the table. ${err}`});
+
+        let buyer = {
+            id: req.body.id,
+            image: req.file.filename
+        }
+        kafka.make_request("profile", {type: "updateBuyerImage", message: buyer},
+        function(err, result) {
+            if(result){
+                console.log("Buyer image updated succesfully");
+                res.status(200).send({message:'Buyer image updated succesfully.'});
+            }else{
+                res.status(err.statusCode).json(err.info);
+            }
         }); 
     });
 });
@@ -38,45 +47,69 @@ router.post('/owner-profile-image', (req, res) => {
 
     upload(req, res, function(err){
         if(err){
-            res.status(500).send({message: `Owner Image uploaded failed due to internal issue. ${err}`});
+            res.status(500).send({message: `Owner Image upload failed due to internal issue. ${err}`});
             return;
         }
-        queries.updateOwnerImage({id: req.body.id, image: req.file.filename}, doc => {
-            console.log("Owner image updated succesfully");
-            res.status(200).send({message:'Owner image updated succesfully.'});    
-        }, err => {
-            res.status(500).send({message: `Something wrong when updating owner image in the table. ${err}`});
-        }); 
+
+        let owner = {
+            id: req.body.id,
+            image: req.file.filename
+        }
+        kafka.make_request("profile", {type: "updateOwnerImage", message: owner},
+        function(err, result) {
+            if(result){
+                console.log("Owner image updated succesfully");
+                res.status(200).send({message:'Owner image updated succesfully.'});
+            }else{
+                res.status(err.statusCode).json(err.info);
+            }
+        });
     });
 });
 
 router.post('/restaurant-profile-image', (req, res) => {
     upload(req, res, function(err){
         if(err){
-            res.status(500).send({message: `Restaurant Image uploaded failed due to internal issue. ${err}`});
+            res.status(500).send({message: `Restaurant Image upload failed due to internal issue. ${err}`});
             return;
         }
-        queries.updateRestaurantImageByOwnerId({ownerId: req.body.ownerId, image: req.file.filename}, doc => {
-            console.log("Restaurant image updated succesfully");
-            res.status(200).send({message:'Restaurant image updated succesfully.'});    
-        }, err => {
-            res.status(500).json(`Something wrong when updating restaurant image in the table. ${err}`);
-        });
-        
+
+        let restaurant = {
+            ownerId: req.body.ownerId,
+            image: req.file.filename
+        }
+        kafka.make_request("profile", {type: "updateRestaurantImage", message: restaurant},
+        function(err, result) {
+            if(result){
+                console.log("Restaurant image updated succesfully");
+                res.status(200).send({message:'Restaurant image updated succesfully.'});
+            }else{
+                res.status(err.statusCode).json(err.info);
+            }
+        });       
     });
 });
 
 router.post('/menu-image', (req, res) => {
     upload(req, res, function(err){
         if(err){
-            res.status(500).send({message: `Menu Image uploaded failed due to internal issue. ${err}`});
+            res.status(500).send({message: `Menu Image upload failed due to internal issue. ${err}`});
             return;
         }
-        queries.updateMenuImage({id: req.body.menuId, sectionId:req.body.sectionId, ownerId:req.body.ownerId,  image: req.file.filename}, result => {
-            console.log("Menu Image updated succesfully");
-            res.status(200).send({message:'Menu image updated succesfully.'});    
-        }, err => {
-            res.status(500).send({message: `Something wrong when updating menu image in the collection. ${err}`});
+
+        let menu = {
+            id: req.body.menuId,
+            sectionId:req.body.sectionId,
+            ownerId: req.body.ownerId,
+            image: req.file.filename
+        }
+        kafka.make_request("restaurant_menu", {type: "updateMenuImage", message: menu},
+        function(err, result) {
+            if(result){
+                res.status(200).send({message:'Menu image updated succesfully.'});
+            }else{
+                res.status(err.statusCode).json(err.info);
+            }
         });
     });
 });

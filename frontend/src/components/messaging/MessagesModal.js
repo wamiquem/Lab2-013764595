@@ -1,7 +1,6 @@
 import React,{Component} from 'react';
 import backendURL from '../../urlconfig';
 
-// const $ = window.$;
 class MessagesModal extends Component {
      //call the constructor method
      constructor(props){
@@ -11,7 +10,7 @@ class MessagesModal extends Component {
         this.changeHandler = this.changeHandler.bind(this);
         this.scrollToBottom = this.scrollToBottom.bind(this);
         this.clearMessage = this.clearMessage.bind(this);
-        // this.messagesEndRef = React.createRef()
+
         //maintain the state required for this component
         this.state = {
             message: ""
@@ -21,21 +20,6 @@ class MessagesModal extends Component {
     //get the first name of owner from backend  
     componentDidMount(){
         this.scrollToBottom();
-        // console.log("Inside Component Did Mount of Modal");
-        // $(ReactDOM.findDOMNode()).modal('show');
-        // $(ReactDOM.findDOMNode()).on('hidden.bs.modal', this.props.hideMessageModal);
-        // $(ReactDOM.findDOMNode()).modal({
-        //     backdrop: "static",
-        //     show: false
-        // });
-        // let modal = ReactDOM.findDOMNode(this);
-        // ReactDOM.findDOMNode(this).
-        // ReactDOM.findDOMNode(this);
-    }
-
-    componentWillUnmount() {
-        // $(ReactDOM.findDOMNode()).off();
-        
     }
 
     componentDidUpdate() {

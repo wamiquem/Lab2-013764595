@@ -1,13 +1,14 @@
-const con = require('./dbconnection_pool');
-const Buyer = require('./models/buyer');
-const Owner = require('./models/owner');
-const Restaurant = require('./models/restaurant');
-const Order = require('./models/order');
-const Counter = require('./models/counter');
+// const con = require('../../backend/dbconnection_pool');
+const Buyer = require('../models/buyer');
+const Owner = require('../models/owner');
+const Restaurant = require('../models/restaurant');
+const Order = require('../models/order');
+const Counter = require('../models/counter');
 
 var queries = {};
 
 queries.createBuyer = (buyer, hash, successcb, failurecb) => {
+    console.log("Creating buyer");
     const doc = new Buyer({
         fname: buyer.firstName,
         lname: buyer.lastName,
@@ -20,6 +21,12 @@ queries.createBuyer = (buyer, hash, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
+queries.authenticateBuyer = (id, successcb, failurecb) => {
+    Buyer.findOne({_id:id})
+    .then(buyer => successcb(buyer))
+    .catch(err => failurecb(err))
+}
+
 queries.getBuyerPasswordByEmail = (email, successcb, failurecb) => {
     Buyer.findOne({email})
     .select('password fname _id')
@@ -27,28 +34,9 @@ queries.getBuyerPasswordByEmail = (email, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.getBuyerPasswordById = (id, successcb, failurecb) => {
-    let sql = 'SELECT password FROM buyers WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
-}
-
 queries.getBuyerFirstNameById = (id, successcb, failurecb) => {
     Buyer.findOne({_id:id})
     .select('fname')
-    .then(buyer => successcb(buyer))
-    .catch(err => failurecb(err))
-}
-
-queries.getBuyerAddressById = (id, successcb, failurecb) => {
-    Buyer.findOne({_id: id})
-    .select('phone street unit_no city state zip_code')
     .then(buyer => successcb(buyer))
     .catch(err => failurecb(err))
 }
@@ -67,47 +55,8 @@ queries.getBuyerDetailsById = (id, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.updateBuyerName = (buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers SET fname = ?,  lname = ? WHERE id = ?`;
-    let values = [buyer.fname, buyer.lname, buyer.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateBuyerEmail = (buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers SET email = ? WHERE id = ?`;
-    let values = [buyer.email, buyer.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateBuyerPassword = (buyer, successcb, failurecb) => {
-    let sql = `UPDATE buyers SET password = ? WHERE id = ?`;
-    let values = [buyer.password, buyer.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateBuyerAddress = (id, buyer, successcb, failurecb) => {
-    Buyer.findOne({_id:id})
+queries.updateBuyerAddress = (buyer, successcb, failurecb) => {
+    Buyer.findOne({_id:buyer.id})
     .then(buyerToUpdate => {
         buyerToUpdate["phone"] = buyer.phone;
         buyerToUpdate["street"] = buyer.street;
@@ -124,8 +73,8 @@ queries.updateBuyerAddress = (id, buyer, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.updateBuyerProfile = (id, buyer, successcb, failurecb) => {
-    Buyer.findOne({_id:id})
+queries.updateBuyerProfile = (buyer, successcb, failurecb) => {
+    Buyer.findOne({_id:buyer.id})
     .then(buyerToUpdate => {
         buyerToUpdate["fname"] = buyer.fname;
         buyerToUpdate["lname"] = buyer.lname;
@@ -173,23 +122,17 @@ queries.createOwner = (owner, hash, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
+queries.authenticateOwner = (id, successcb, failurecb) => {
+    Owner.findOne({_id:id})
+    .then(owner => successcb(owner))
+    .catch(err => failurecb(err))
+}
+
 queries.getOwnerPasswordByEmail = (email, successcb, failurecb) => {
     Owner.findOne({email})
     .select('password fname _id')
     .then(result => successcb(result))
     .catch(err => failurecb(err))
-}
-
-queries.getOwnerPasswordById = (id, successcb, failurecb) => {
-    let sql = 'SELECT password FROM owners WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
 }
 
 queries.getOwnerFirstNameById = (id, successcb, failurecb) => {
@@ -213,47 +156,8 @@ queries.getOwnerDetailsById = (id, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.updateOwnerName = (owner, successcb, failurecb) => {
-    let sql = `UPDATE owners SET fname = ?,  lname = ? WHERE id = ?`;
-    let values = [owner.firstName, owner.lastName, owner.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateOwnerEmail = (owner, successcb, failurecb) => {
-    let sql = `UPDATE owners SET email = ? WHERE id = ?`;
-    let values = [owner.email, owner.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateOwnerPassword = (owner, successcb, failurecb) => {
-    let sql = `UPDATE owners SET password = ? WHERE id = ?`;
-    let values = [owner.password, owner.id];
-    
-    con.query(sql, values, function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
-queries.updateOwnerProfile = (id, owner, successcb, failurecb) => {
-    Owner.findOne({_id:id})
+queries.updateOwnerProfile = (owner, successcb, failurecb) => {
+    Owner.findOne({_id:owner.id})
     .then(ownerToUpdate => {
         ownerToUpdate["fname"] = owner.fname;
         ownerToUpdate["lname"] = owner.lname;
@@ -299,21 +203,6 @@ queries.createRestaurant = (restaurant, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.updateRestaurant = (ownerId, restaurant, successcb, failurecb) => {
-    let sql = `UPDATE owners 
-    SET name = ?, street = ?, city =?, state = ?, zip = ?, cuisine = ?
-    WHERE id = ?`;
-    let values = [restaurant.name, restaurant.street, restaurant.city, 
-        restaurant.state, restaurant.zip, restaurant.cuisine, ownerId];
-    con.query(sql, [[values]], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
 queries.updateRestaurantImageByOwnerId = (restaurant, successcb, failurecb) => {
     Restaurant.findOne({owner_id: restaurant.ownerId})
     .then(restaurantToUpdate => {
@@ -326,26 +215,6 @@ queries.updateRestaurantImageByOwnerId = (restaurant, successcb, failurecb) => {
     })
     .catch(err => failurecb(err))
 }
-
-queries.getRestaurantIdByOwnerId = (ownerId, successcb, failurecb) => {
-    let sql = 'SELECT id FROM restaurants WHERE owner_id = ?';
-
-    con.query(sql, [ownerId], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
-}
-
-// queries.getOwnerIdByRestaurantId = (restId, successcb, failurecb) => {
-//     Restaurant.findOne({_id: restId})
-//     .select('owner_id')
-//     .then(restaurant => {
-//         console.log("restaurant ===", restaurant);successcb(restaurant)})
-//     .catch(err => failurecb(err))
-// }
 
 queries.addSection = (section, successcb, failurecb) => {
     Restaurant.findOne({owner_id: section.ownerId})
@@ -366,18 +235,6 @@ queries.addSection = (section, successcb, failurecb) => {
         .catch(err => failurecb(err))
     })
     .catch(err => failurecb(err))
-}
-
-queries.getSectionByRestaurantId = (restId, successcb, failurecb) => {
-    let sql = 'SELECT * FROM sections WHERE rest_id = ?';
-    
-    con.query(sql, [restId], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
 }
 
 queries.getSectionsByOwnerId = (ownerId, successcb, failurecb) => {
@@ -466,18 +323,6 @@ queries.updateMenuImage = (menu, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.deleteMenuByMenuId = (menuId, successcb, failurecb) => {
-    let sql = 'DELETE FROM menus WHERE id = ?';
-    
-    con.query(sql, [menuId], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
 queries.deleteMenu = (menu, successcb, failurecb) => {
     Restaurant.findOne({owner_id: menu.ownerId})
     .then(restaurant => {
@@ -491,35 +336,10 @@ queries.deleteMenu = (menu, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.getMenuByRestaurantId = (restId, successcb, failurecb) => {
-    let sql = `SELECT id, section_id, rest_id, name, description, price 
-    FROM menus WHERE rest_id = ?`;
-    
-    con.query(sql, [restId], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
 queries.getMenus = (ownerId, successcb, failurecb) => {
     Restaurant.findOne({owner_id: ownerId})
     .then(result => successcb(result))
     .catch(err => failurecb(err))
-}
-
-queries.getMenuImageNameById = (id, successcb, failurecb) => {
-    let sql = 'SELECT image FROM menus WHERE id = ?';
-
-    con.query(sql, [id], function (err, row){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(row[0]);
-    });
 }
 
 queries.updateMenu = (menu, successcb, failurecb) => {
@@ -585,20 +405,6 @@ queries.createOrder = (order, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.createOrderDetails = (orderId, items, successcb, failurecb) => {    
-    let sql = `INSERT INTO order_details
-    (order_id, menu_id, quantity, price) 
-    VALUES ?`;
-    let values = items.map(item => [orderId, item.id, item.quantity, item.price]);
-    con.query(sql, [values], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
-}
-
 queries.getAllOrders = (ownerId, successcb, failurecb) => {
     Order.find({ownerId: ownerId}).sort({ id: -1 })
     .then(orders => successcb(orders))
@@ -615,20 +421,6 @@ queries.getPastOrdersbyBuyerId = (buyerId, successcb, failurecb) => {
     Order.find({buyerId: buyerId, status: {"$in": ["Delivered", "Cancelled"]}}).sort({ id: -1 })
     .then(orders => successcb(orders))
     .catch(err => failurecb(err))
-}
-
-queries.getMenuItemsByOrderId = (order_id, successcb, failurecb) => {
-    let sql = `SELECT  m.name, m.price, o.quantity from order_details o, menus m
-    where o.menu_id = m.id
-    AND o.order_id = ?`;
-    
-    con.query(sql, [order_id], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        successcb(result);
-    });
 }
 
 queries.updateOrderStatus = (order, successcb, failurecb) => {
@@ -654,19 +446,6 @@ queries.getAllMatchingRestaurants = (menuItem, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.getRestaurantsByCuisine = (cuisine, successcb, failurecb) => {
-    let sql = `SELECT name, street, city, state from restaurants r
-    WHERE cuisine like '%` + cuisine +  `%' `;
-    con.query(sql, [cuisine], function (err, result){
-        if (err){
-            failurecb(err);
-            return;
-        }
-        console.log("getRestaurantsByCuisine",result);
-        successcb(result);
-    });
-}
-
 queries.getRestaurantDetailsByOwnerId = (ownerId, successcb, failurecb) => {
     Restaurant.findOne({owner_id: ownerId})
     .select('name phone street city state zip cuisine')
@@ -681,8 +460,8 @@ queries.getRestaurantImageNameByOwnerId = (ownerId, successcb, failurecb) => {
     .catch(err => failurecb(err))
 }
 
-queries.updateRestaurantProfile = (ownerId, rest, successcb, failurecb) => {
-    Restaurant.findOne({owner_id:ownerId})
+queries.updateRestaurantProfile = (rest, successcb, failurecb) => {
+    Restaurant.findOne({owner_id:rest.ownerId})
     .then(restaurantToUpdate => {
         restaurantToUpdate["name"] = rest.name;
         restaurantToUpdate["phone"] = rest.phone;

@@ -99,7 +99,6 @@ class Checkout extends Component {
             items: this.props.location.state.items,
             totalPrice: this.props.location.totalPrice
         }
-        console.log("data==-=-=-=-==", data);
         fetch(`${backendURL}/buyer/placeOrder`, {
             method: "POST",
             headers: {

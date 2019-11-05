@@ -1,59 +1,13 @@
 import React,{Component} from 'react';
 import {Redirect} from 'react-router';
-import backendURL from '../../urlconfig';
 import Order from './Order';
+import {connect} from 'react-redux';
+import {getBuyerPastOrders} from '../../redux/actions/buyerOrdersAction';
 
 class PastOrders extends Component {
-     //call the constructor method
-     constructor(props){
-        //Call the constrictor of Super class i.e The Component
-        super(props);
-        //maintain the state required for this component
-        this.state = {
-            orders: []
-        }
-        this.handleSendMessage = this.handleSendMessage.bind(this);
-    }
-
     //get the first name of owner from backend  
     componentDidMount(){
-        if(localStorage.getItem('token')){
-            const token = localStorage.getItem('token');
-            fetch(`${backendURL}/buyer/pastOrders/?id=${localStorage.getItem('id')}`,{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
-                credentials: 'include'
-            })
-            .then(res => res.json())
-            .then(data => {                
-                this.setState({
-                    orders: this.state.orders.concat(data.orders)
-                })
-            })
-            .catch(err => console.log(err));
-        }
-    }
-
-    handleSendMessage(message){
-        this.setState(state => {
-            const orders = state.orders.map(order => {
-                // Find a menu with the matching id
-                if(order.id == message.orderId){
-                    //Return a new object
-                    let orderToUpdate = {...order}
-                    orderToUpdate.messages = orderToUpdate.messages.concat(message);
-                    return orderToUpdate;
-                }
-                // Leave every other menu unchanged
-                return order;
-            });
-            return {
-                orders
-            };
-        });
+        this.props.getOrders();
     }
     
     render(){
@@ -74,9 +28,9 @@ class PastOrders extends Component {
                                     className="btn btn-primary btn-status-change">Refresh</button>
                                 </div>
                                 {
-                                    this.state.orders ? 
-                                    this.state.orders.map(order => {
-                                        return <Order order = {order} onSendMessage = {this.handleSendMessage}/>
+                                    this.props.orders ? 
+                                    this.props.orders.map(order => {
+                                        return <Order order = {order} orderType="buyerPast"/>
                                     })
                                     :
                                     <span/>
@@ -90,4 +44,16 @@ class PastOrders extends Component {
     }
 }
 
-export default PastOrders;
+const mapDispatchToProps = dispatch => {
+    return {
+        getOrders: () => {dispatch(getBuyerPastOrders())}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        orders: state.buyerOrders.pastOrders
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PastOrders);

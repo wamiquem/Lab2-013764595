@@ -48,7 +48,7 @@ function buyerLogin(buyer, callback) {
 }
 
 function ownerLogin(owner, callback) {
-    console.log("Inside Kafka Backend Buyer Login service");
+    console.log("Inside Kafka Backend Owner Login service");
 
     queries.getOwnerPasswordByEmail(owner.email, row => {
         if(row){

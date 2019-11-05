@@ -8,7 +8,6 @@ class OldOrder extends Component {
         this.state = {
             showMessages: false
         }
-        this.handleSendMessage = this.handleSendMessage.bind(this);
         this.showMessageModal = this.showMessageModal.bind(this);
         this.hideMessageModal = this.hideMessageModal.bind(this);
     }
@@ -65,9 +64,9 @@ class OldOrder extends Component {
                     <label>Order Status:</label>
                     <h7 style = {{paddingLeft:'5px'}}>{this.props.order.status}</h7>
                 </div> 
-                {this.state.showMessages ? <MessagesModal 
+                {this.state.showMessages ? <MessagesModal orderType="owner"
                 orderId = {this.props.order.id} senderName={this.props.order.restName} 
-                messages = {this.props.order.messages} onSendMessage = {this.handleSendMessage}
+                messages = {this.props.order.messages}
                 hideMessageModal={this.hideMessageModal}/> : null}                
             </div>
         )

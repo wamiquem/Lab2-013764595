@@ -10,7 +10,6 @@ class Order extends Component {
         }
         this.showMessageModal = this.showMessageModal.bind(this);
         this.hideMessageModal = this.hideMessageModal.bind(this);
-        this.handleSendMessage = this.handleSendMessage.bind(this);
     }
 
     showMessageModal = e => {
@@ -23,10 +22,6 @@ class Order extends Component {
         this.setState({
             showMessages: false
         });
-    }
-
-    handleSendMessage(message){
-        this.props.onSendMessage(message);
     }
 
     render(){
@@ -65,9 +60,9 @@ class Order extends Component {
                     <label>Deliver To Address:</label>
                     <h7 style = {{paddingLeft:'5px'}}>{this.props.order.buyerAddress}</h7>
                 </div>    
-                {this.state.showMessages ? <MessagesModal 
+                {this.state.showMessages ? <MessagesModal orderType={this.props.orderType}
                 orderId = {this.props.order.id} senderName={this.props.order.buyerName} 
-                messages = {this.props.order.messages} onSendMessage = {this.handleSendMessage}
+                messages = {this.props.order.messages}
                 hideMessageModal={this.hideMessageModal}/> : null}      
             </div>
         )

@@ -2,20 +2,6 @@ import React,{Component} from 'react';
 import Section from './Section';
 
 class SectionsList extends Component {
-     constructor(props){
-        super(props);
-        this.handleDelete = this.handleDelete.bind(this);
-        this.handleEditChange = this.handleEditChange.bind(this);
-        }
-        
-    handleDelete(sectionId){
-        this.props.onDelete(sectionId);
-    }
-
-    handleEditChange(sectionId, e){
-        this.props.onEditChange(sectionId, e);
-    }
-
     render(){
         return(
             <div>
@@ -27,9 +13,7 @@ class SectionsList extends Component {
                                 {
                                     this.props.sections ? 
                                         this.props.sections.map(section => {
-                                            return <Section section = {section}
-                                            onDelete = {this.handleDelete}
-                                            onEditChange = {this.handleEditChange}/>
+                                            return <Section section = {section}/>
                                         })
                                     :
                                     <span/>

@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
-import backendURL from '../urlconfig';
+import {connect} from 'react-redux';
+import {getBuyerProfile, buyerProfileChangeHandler, updateBuyerImage, updateBuyerProfile} 
+from '../redux/actions/buyerProfileAction';
 
 //create the Buyer Profile Component
 class BuyerProfile extends Component {
@@ -12,69 +14,18 @@ class BuyerProfile extends Component {
         this.cancelEdit = this.cancelEdit.bind(this);
 
         this.state = {
-            message: "",
             isEditable:false,
-            isNewImage: false,
-            fname: "",
-            lname: "",
-            phone: "",
-            street: "",
-            unit: "",
-            city: "",
-            state: "",
-            zip: "",
-            imgURL: ""
+            isNewImage: false
         }
     }
 
     componentDidMount(){
-        if(localStorage.getItem('token')){
-            const token = localStorage.getItem('token');
-            fetch(`${backendURL}/buyer/details/?id=${localStorage.getItem('id')}`,{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                credentials: 'include'
-             })
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    fname: data.buyer.fname,
-                    lname: data.buyer.lname,
-                    phone: data.buyer.phone,
-                    street: data.buyer.street,
-                    unit: data.buyer.unit_no,
-                    city: data.buyer.city,
-                    state: data.buyer.state,
-                    zip: data.buyer.zip_code
-                });
-            })
-            .catch(err => console.log(err));
-
-            fetch(`${backendURL}/buyer/profilePic/?id=${localStorage.getItem('id')}`,{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                credentials: 'include'
-            })
-            .then(res => res.blob())
-            .then(resAsBlob => {
-                this.setState({
-                    imgURL: URL.createObjectURL(resAsBlob)
-                });
-            })
-        }
+        this.props.getProfile();
     }
     
     //input change handler to update state variable with the text entered by the user
     handleChange(e) {
-        this.setState({
-            [e.target.name] : e.target.value
-        })
+        this.props.handleChange(e);
     }
 
     editProfile = () => {
@@ -104,70 +55,16 @@ class BuyerProfile extends Component {
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
         formData.append('id', localStorage.getItem('id'));
         
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/upload/buyer-profile-image`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: formData
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message
-                    })
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                });
-            }
-        })
-        .catch(err => console.log(err));
+        this.props.updateImage(formData);
     }
 
     updateProfile = (e) => {
         e.preventDefault();
-        const data = this.state;
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/buyer/updateProfile/?id=${localStorage.getItem('id')}`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
+        const data = this.props.profile;
+        this.props.updateProfile(data);
+        this.setState({
+            isEditable: false
         })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message,
-                        isEditable: false
-                    })
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                });
-            }
-        })
-        .catch(err => console.log(err));
     }
 
     render(){
@@ -207,68 +104,68 @@ class BuyerProfile extends Component {
             <div>
                 
                 <div className="container">
-                    <form onSubmit = {this.updateProfile}>
+                    <form onSubmit = {this.updateProfile} name = "testform">
                     <div className="profile-form">
                         <div className="main-div">
                             <div className="panel">
-                                <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                                <h2 style= {{color:"red"}}>{this.props.profile.responseMessage}</h2>
                                 <h2>Buyer Profile</h2>
                                 <p>View or Update Profile</p>
                             </div>
                             <div class = "profile-image">
                                 <label>Image</label>
                                 <img className="rounded float-left img-thumbnail" id="pic" 
-                                src={this.state.imgURL} alt="Responsive image"></img>
+                                src={this.props.profile.imgURL} alt="Responsive image"></img>
                             </div>
                             {imageEdit}
                             <div className="form-group form-inline">
                                 <label >First Name</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="fname" placeholder="First Name"
-                                value = {this.state.fname}/>
+                                value = {this.props.profile.fname}/>
                             
                             </div>
                             <div className="form-group form-inline">
                                 <label >Last Name</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="lname" placeholder="Last Name"
-                                value = {this.state.lname}/>
+                                value = {this.props.profile.lname}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Phone</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="number" min="1" step="1" className="form-control" name="phone" placeholder="Phone"
-                                value = {this.state.phone}/>
+                                value = {this.props.profile.phone}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Street</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="street" placeholder="Street"
-                                value = {this.state.street}/>
+                                value = {this.props.profile.street}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Unit</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="number" min="1" step="1" className="form-control" name="unit" placeholder="Unit"
-                                value = {this.state.unit}/>
+                                value = {this.props.profile.unit}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >City</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="city" placeholder="City"
-                                value = {this.state.city}/>
+                                value = {this.props.profile.city}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >State</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="state" placeholder="State"
-                                value = {this.state.state}/>
+                                value = {this.props.profile.state}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Zip</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="number" min="1" step="1" className="form-control" name="zip" placeholder="Zip"
-                                value = {this.state.zip}/>
+                                value = {this.props.profile.zip}/>
                             </div>
                                 {profileUpdate}   
                                 {profileEdit}          
@@ -283,4 +180,19 @@ class BuyerProfile extends Component {
     }
 }
 
-export default BuyerProfile;
+const mapDispatchToProps = dispatch => {
+    return {
+        getProfile: () => {dispatch(getBuyerProfile())},
+        handleChange: e => {dispatch(buyerProfileChangeHandler(e))},
+        updateImage: formData => {dispatch(updateBuyerImage(formData))},
+        updateProfile: data => {dispatch(updateBuyerProfile(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        profile: state.buyerProfile
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BuyerProfile);

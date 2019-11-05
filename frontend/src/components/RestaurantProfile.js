@@ -1,7 +1,9 @@
 import React,{Component} from 'react';
-import backendURL from '../urlconfig';
+import {connect} from 'react-redux';
+import {getRestaurantProfile, restaurantProfileChangeHandler, updateRestaurantImage, updateRestaurantProfile} 
+from '../redux/actions/restaurantProfileAction';
 
-//create the Owner Profile Component
+//create the Restaurant Profile Component
 class RestaurantProfile extends Component {
     constructor(props){
         super(props);
@@ -12,67 +14,18 @@ class RestaurantProfile extends Component {
         this.cancelEdit = this.cancelEdit.bind(this);
 
         this.state = {
-            message: "",
             isEditable:false,
-            isNewImage: false,
-            name: "",
-            phone: "",
-            street: "",
-            city: "",
-            state: "",
-            zip: "",
-            cuisine:"",
-            imgURL: ""
+            isNewImage: false
         }
     }
 
     componentDidMount(){
-        if(localStorage.getItem('token')){
-            const token = localStorage.getItem('token');
-            fetch(`${backendURL}/restaurant/details/?ownerId=${localStorage.getItem('id')}`,{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                credentials: 'include'
-             })
-            .then(res => res.json())
-            .then(data => {
-                this.setState({
-                    name: data.restaurant.name,
-                    phone: data.restaurant.phone,
-                    street: data.restaurant.street,
-                    city: data.restaurant.city,
-                    state: data.restaurant.state,
-                    zip: data.restaurant.zip,
-                    cuisine: data.restaurant.cuisine
-                });
-            })
-            .catch(err => console.log(err));
-
-            fetch(`${backendURL}/restaurant/profilePic/?ownerId=${localStorage.getItem('id')}`,{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                credentials: 'include'
-            })
-            .then(res => res.blob())
-            .then(resAsBlob => {
-                this.setState({
-                    imgURL: URL.createObjectURL(resAsBlob)
-                });
-            })
-        }
+        this.props.getProfile();
     }
     
     //input change handler to update state variable with the text entered by the user
     handleChange(e) {
-        this.setState({
-            [e.target.name] : e.target.value
-        })
+        this.props.handleChange(e);
     }
 
     editProfile = () => {
@@ -102,70 +55,16 @@ class RestaurantProfile extends Component {
         formData.append('image', document.querySelector('input[type="file"]').files[0]);
         formData.append('ownerId', localStorage.getItem('id'));
         
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/upload/restaurant-profile-image`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: formData
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message
-                    })
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                });
-            }
-        })
-        .catch(err => console.log(err));
+        this.props.updateImage(formData);
     }
 
     updateProfile = (e) => {
         e.preventDefault();
-        const data = this.state;
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/updateProfile/?ownerId=${localStorage.getItem('id')}`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
+        const data = this.props.profile;
+        this.props.updateProfile(data);
+        this.setState({
+            isEditable: false
         })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message,
-                        isEditable: false
-                    })
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                });
-            }
-        })
-        .catch(err => console.log(err));
     }
 
     render(){        
@@ -209,57 +108,57 @@ class RestaurantProfile extends Component {
                     <div className="profile-form">
                         <div className="main-div">
                             <div className="panel">
-                                <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                                <h2 style= {{color:"red"}}>{this.props.profile.responseMessage}</h2>
                                 <h2>Restaurant Profile</h2>
                                 <p>View or Update Profile</p>
                             </div>
                             <div class = "profile-image">
                                 <label>Image</label>
                                 <img className="rounded float-left img-thumbnail" id="pic" 
-                                src={this.state.imgURL} alt="Responsive image"></img>
+                                src={this.props.profile.imgURL} alt="Responsive image"></img>
                             </div>
                             {imageEdit}
                             <div className="form-group form-inline">
                                 <label >Name</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="name" placeholder="Name"
-                                value = {this.state.name}/>
+                                value = {this.props.profile.name}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Phone</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="number" min="1" step="1" className="form-control" name="phone" placeholder="Phone"
-                                value = {this.state.phone}/>
+                                value = {this.props.profile.phone}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Street</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="street" placeholder="Street"
-                                value = {this.state.street}/>
+                                value = {this.props.profile.street}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >City</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="city" placeholder="City"
-                                value = {this.state.city}/>
+                                value = {this.props.profile.city}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >State</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="state" placeholder="State"
-                                value = {this.state.state}/>
+                                value = {this.props.profile.state}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Zip</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="number" min="1" step="1" className="form-control" name="zip" placeholder="Zip"
-                                value = {this.state.zip}/>
+                                value = {this.props.profile.zip}/>
                             </div>
                             <div className="form-group form-inline">
                                 <label >Cuisine</label>
                                 <input required disabled={!this.state.isEditable} onChange = {this.handleChange} 
                                 type="text" className="form-control" name="cuisine" placeholder="Cuisine"
-                                value = {this.state.cuisine}/>
+                                value = {this.props.profile.cuisine}/>
                             </div>
                                 {profileUpdate}   
                                 {profileEdit}          
@@ -274,4 +173,19 @@ class RestaurantProfile extends Component {
     }
 }
 
-export default RestaurantProfile;
+const mapDispatchToProps = dispatch => {
+    return {
+        getProfile: () => {dispatch(getRestaurantProfile())},
+        handleChange: e => {dispatch(restaurantProfileChangeHandler(e))},
+        updateImage: formData => {dispatch(updateRestaurantImage(formData))},
+        updateProfile: data => {dispatch(updateRestaurantProfile(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        profile: state.restaurantProfile
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(RestaurantProfile);

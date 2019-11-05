@@ -13,7 +13,6 @@ class NewOrder extends Component {
         //Bind the handlers to this class
         this.handleEditChange = this.handleEditChange.bind(this);
         this.updateStatus = this.updateStatus.bind(this);
-        this.handleSendMessage = this.handleSendMessage.bind(this);
         this.showMessageModal = this.showMessageModal.bind(this);
         this.hideMessageModal = this.hideMessageModal.bind(this);
     }
@@ -28,11 +27,6 @@ class NewOrder extends Component {
         this.setState({
             showMessages: false
         });
-    }
-
-    handleSendMessage(message){
-        console.log("New Orders Props called");
-        this.props.onSendMessage(message);
     }
 
     updateStatus = (e) => {
@@ -138,9 +132,9 @@ class NewOrder extends Component {
                     <button onClick = {this.updateStatus}
                     className="btn btn-primary btn-status-change">Change Status</button>
                 </div>
-                {this.state.showMessages ? <MessagesModal 
+                {this.state.showMessages ? <MessagesModal orderType="owner"
                 orderId = {this.props.order.id} senderName={this.props.order.restName} 
-                messages = {this.props.order.messages} onSendMessage = {this.handleSendMessage}
+                messages = {this.props.order.messages}
                 hideMessageModal={this.hideMessageModal}/> : null} 
             </div>
         )

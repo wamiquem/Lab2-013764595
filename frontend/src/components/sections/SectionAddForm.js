@@ -1,14 +1,13 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
-import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {addSection} from '../../redux/actions/sectionsAction';
 
 class SectionAddForm extends Component {
      constructor(props){
         super(props);
         this.state = {
-            name : "",
-            message: ""
+            name : ""
         }
         //Bind the handlers to this class
         this.nameChangeHandler = this.nameChangeHandler.bind(this);
@@ -30,39 +29,7 @@ class SectionAddForm extends Component {
             name : this.state.name
         }
 
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/addSection`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                    this.props.onAdd({id: JSON.parse(data).id, name: this.state.name});
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                })
-                
-            }
-        })
-        .catch(err => console.log(err));
+        this.props.addSection(data);
     }
     
     render(){
@@ -79,7 +46,7 @@ class SectionAddForm extends Component {
                     <div className="add-section-form">
                         <div className="main-div">
                             <div className="panel">
-                            <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                            <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2>
                                 <h4>Add Section</h4>
                                 <hr/>
                                 <div style={{display:'flex'}}>
@@ -100,4 +67,16 @@ class SectionAddForm extends Component {
     }
 }
 
-export default SectionAddForm;
+const mapDispatchToProps = dispatch => {
+    return {
+        addSection: data => {dispatch(addSection(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.sections.addResponseMessage
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SectionAddForm);

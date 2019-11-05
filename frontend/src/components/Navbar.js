@@ -1,21 +1,18 @@
 import React,{Component} from 'react';
 import {Link} from 'react-router-dom';
-import cookie from 'react-cookies';
-import {Redirect} from 'react-router';
+import {connect} from 'react-redux';
+import {logout} from '../redux/actions/authAction';
 
 //create the Navbar Component
 class Navbar extends Component {
     constructor(props){
         super(props);
-        console.log("889989898= ", this.props);
         this.handleLogout = this.handleLogout.bind(this);
     }
     //handle logout to destroy the cookie
     handleLogout = () => {
-        cookie.remove('cookie', { path: '/' })
-        // localStorage.removeItem('userType');
-        // localStorage.removeItem('id');
-        localStorage.clear();
+        this.props.logout();
+        // localStorage.clear();
     }
 
     render(){
@@ -43,16 +40,9 @@ class Navbar extends Component {
                             {navRestaurant}
                             <li role="separator" className="divider"></li>
                             <li><Link to="/" onClick = {this.handleLogout}>Sign Out</Link></li>
-                            {/* <li><a href="#">Something else here</a></li>
-                            <li role="separator" className="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                            <li role="separator" className="divider"></li>
-                            <li><a href="#">One more separated link</a></li> */}
                         </ul>
                     </li>
                 </ul>
-                // </div>
-                
             );
         }
         
@@ -67,9 +57,16 @@ class Navbar extends Component {
                     </div>
                     
                 </nav>
-        </div>
+            </div>
         )
     }
 }
 
-export default Navbar;
+const mapDispatchToProps = dispatch => {
+    return {
+        logout: () => {dispatch(logout())}
+    }
+}
+
+// export default Navbar;
+export default connect(null, mapDispatchToProps)(Navbar);

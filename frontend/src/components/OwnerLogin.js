@@ -3,7 +3,8 @@ import {Link} from 'react-router-dom';
 import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
-import backendURL from '../urlconfig';
+import {connect} from 'react-redux';
+import {loginOwner} from '../redux/actions/authAction';
 
 //create the OwnerLogin Component
 class OwnerLogin extends Component {
@@ -15,8 +16,6 @@ class OwnerLogin extends Component {
         this.state = {
             email : "",
             password : "",
-            authFlag : false,
-            message: "",
         }
         //Bind the handlers to this class
         this.emailChangeHandler = this.emailChangeHandler.bind(this);
@@ -44,57 +43,55 @@ class OwnerLogin extends Component {
     }
     //submit Login handler to send a request to the node backend
     submitLogin = (e) => {
-        var headers = new Headers();
         //prevent page from refresh
         e.preventDefault();
         const data = {
             email : this.state.email,
             password : this.state.password
         }
-
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/owner/login`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                localStorage.setItem('userType','owner');
-                res.text().then(data => {
-                    console.log(data);
-                    localStorage.setItem('id',JSON.parse(data).id);
-                    localStorage.setItem('fname',JSON.parse(data).firstName);
-                    localStorage.setItem('token',JSON.parse(data).token);
-                    this.setState({
-                        authFlag : true,
-                        fname: JSON.parse(data).firstName
-                    });
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        authFlag : false,
-                        message: responseMessage
-                    })
-                })
+        this.props.loginOwner(data);
+        // fetch(`${backendURL}/owner/login`, {
+        //     method: "POST",
+        //     headers: {
+        //         'Accept': 'application/json,  text/plain, */*',
+        //         'Content-Type': 'application/json'
+        //     },
+        //     credentials: 'include',
+        //     body: JSON.stringify(data)
+        // })
+        // .then(res => {
+        //     if(res.status === 200){
+        //         localStorage.setItem('userType','owner');
+        //         res.text().then(data => {
+        //             console.log(data);
+        //             localStorage.setItem('id',JSON.parse(data).id);
+        //             localStorage.setItem('fname',JSON.parse(data).firstName);
+        //             localStorage.setItem('token',JSON.parse(data).token);
+        //             this.setState({
+        //                 authFlag : true,
+        //                 fname: JSON.parse(data).firstName
+        //             });
+        //         });
+        //     }else{
+        //         res.text().then(data => {
+        //             console.log(data);
+        //             let responseMessage = JSON.parse(data).message;
+        //             this.setState({
+        //                 authFlag : false,
+        //                 message: responseMessage
+        //             })
+        //         })
                 
-            }
-        })
-        .catch(err => console.log(err));
+        //     }
+        // })
+        // .catch(err => console.log(err));
     }
+
     render(){
         //if Cookie is set render Owner Home Page
         let redirectVar = null;
         if(localStorage.getItem('token')){
-            redirectVar = <Redirect to= {{ pathname: "/owner/home", fname: this.state.fname}}/>
+            redirectVar = <Redirect to= {{ pathname: "/owner/home", fname: this.props.fname}}/>
         }
         return(
             <div>
@@ -107,7 +104,7 @@ class OwnerLogin extends Component {
                     <div className="login-form">
                         <div className="main-div">
                             <div className="panel">
-                                <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                                <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2>
                                 <h2>Owner Login</h2>
                                 <p>Sign in with your Grubhub Account</p>
                             </div>
@@ -131,4 +128,17 @@ class OwnerLogin extends Component {
     }
 }
 
-export default OwnerLogin;
+const mapDispatchToProps = dispatch => {
+    return {
+        loginOwner: data => {dispatch(loginOwner(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.auth.responseMessage,
+        fname: state.auth.fname
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(OwnerLogin);

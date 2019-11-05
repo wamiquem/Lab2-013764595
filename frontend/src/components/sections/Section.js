@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
 import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {sectionChangeHandler, updateSection, deleteSection} from '../../redux/actions/sectionsAction';
 
 class Section extends Component {
      constructor(props){
@@ -17,7 +19,7 @@ class Section extends Component {
     }
 
     handleEditChange = e => {
-        this.props.onEditChange(this.props.section._id, e.target);
+        this.props.handleEditChange(this.props.section._id, e);
     }
 
     editSection = () => {
@@ -32,6 +34,11 @@ class Section extends Component {
         });
     }
 
+    handleIsEditableOnUpdate(data, cb){
+        this.props.updateSection(data);
+        cb();
+    }
+
     //submit Login handler to send a request to the node backend
     updateSection = (e) => {
         //prevent page from refresh
@@ -42,39 +49,13 @@ class Section extends Component {
             name : this.props.section.name
         }
 
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/updateSection`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage,
-                        isEditable: false
-                    })
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
+        this.handleIsEditableOnUpdate(data, () => {
+            if(this.props.responseMessage === 'Section updated'){
+                this.setState({
+                    isEditable: false
                 })
-                
             }
         })
-        .catch(err => console.log(err));
     }
 
     deleteSection = (e) => {
@@ -85,33 +66,7 @@ class Section extends Component {
             id : this.props.section._id
         }
 
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/deleteSection`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => console.log(data));
-                this.props.onDelete(this.props.section._id);
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                })
-                
-            }
-        })
-        .catch(err => console.log(err));
+        this.props.deleteSection(data);
     }
 
     render(){
@@ -135,7 +90,13 @@ class Section extends Component {
         return(
             <div>
                 <hr/>
-                <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                
+                {
+                this.props.section._id === this.props.sectionToUpdate ? 
+                <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2> : 
+                null
+                }
+                
                 <div className = "section-bar">
                     <input  onChange = {this.handleEditChange} 
                     value = {this.props.section.name} disabled={!this.state.isEditable}
@@ -151,4 +112,19 @@ class Section extends Component {
     }
 }
 
-export default Section;
+const mapDispatchToProps = dispatch => {
+    return {
+        handleEditChange: (id,e) => {dispatch(sectionChangeHandler(id,e))},
+        updateSection: data => {dispatch(updateSection(data))},
+        deleteSection: data => {dispatch(deleteSection(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.sections.responseMessage,
+        sectionToUpdate: state.sections.sectionToHandle
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Section);

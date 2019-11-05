@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
-import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {sendOwnerMessage} from '../../redux/actions/ownerOrdersAction';
+import {sendBuyerMessage} from '../../redux/actions/buyerOrdersAction';
 
 class MessagesModal extends Component {
      //call the constructor method
@@ -55,41 +57,14 @@ class MessagesModal extends Component {
             sentDate: new Date().toLocaleString(),
             text : this.state.message
         }
-
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/addMessage`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(message)
+        if(this.props.orderType === 'owner'){
+            this.props.sendOwnerMessage(message);
+        } else {
+            this.props.sendBuyerMessage(message, this.props.orderType);
+        }
+        this.setState({
+            message: ""
         })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(responseData => {
-                    console.log(responseData);
-                    let responseMessage = JSON.parse(responseData).message;
-                    this.setState({
-                        responseMessage: responseMessage,
-                        message: ""
-                    })
-                    this.props.onSendMessage(message);
-                });
-            }else{
-                res.text().then(responseData => {
-                    console.log(responseData);
-                    let responseMessage = JSON.parse(responseData).message;
-                    this.setState({
-                        responseMessage: responseMessage
-                    })
-                })
-                
-            }
-        })
-        .catch(err => console.log(err));
     }
     
     render(){
@@ -104,7 +79,7 @@ class MessagesModal extends Component {
                   </div>
                   <form onSubmit = {this.submitSend}>
                   <div className="modal-body">
-                  <h2 style= {{color:"red"}}>{this.state.responseMessage}</h2>
+                  <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2>
                   {this.props.messages.length > 0 ? 
                     this.props.messages.map(message => {
                         return(
@@ -137,4 +112,23 @@ class MessagesModal extends Component {
     }
 }
 
-export default MessagesModal;
+const mapDispatchToProps = dispatch => {
+    return {
+        sendOwnerMessage: message => {dispatch(sendOwnerMessage(message))},
+        sendBuyerMessage: (message,type) => {dispatch(sendBuyerMessage(message,type))}
+    }
+}
+
+const mapStateToProps = (state,ownProps) => {
+    if(ownProps.orderType === 'owner'){
+        return {
+            responseMessage: state.ownerOrders.responseMessage
+        }
+    } else {
+        return {
+            responseMessage: state.buyerOrders.responseMessage
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessagesModal);

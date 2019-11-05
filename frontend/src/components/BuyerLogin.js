@@ -2,7 +2,8 @@ import React,{Component} from 'react';
 import {Link} from 'react-router-dom';
 import {Redirect} from 'react-router';
 import Navbar from './Navbar';
-import backendURL from '../urlconfig';
+import {connect} from 'react-redux';
+import {loginBuyer} from '../redux/actions/authAction';
 
 //create the Navbar Component
 class BuyerLogin extends Component {
@@ -13,10 +14,7 @@ class BuyerLogin extends Component {
         //maintain the state required for this component
         this.state = {
             email : "",
-            password : "",
-            authFlag : false,
-            message: "",
-            fname: ""
+            password : ""
         }
         //Bind the handlers to this class
         this.emailChangeHandler = this.emailChangeHandler.bind(this);
@@ -44,57 +42,20 @@ class BuyerLogin extends Component {
     }
     //submit Login handler to send a request to the node backend
     submitLogin = (e) => {
-        var headers = new Headers();
         //prevent page from refresh
         e.preventDefault();
         const data = {
             email : this.state.email,
             password : this.state.password
         }
-
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/buyer/login`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                localStorage.setItem('userType','buyer');
-                res.text().then(data => {
-                    console.log(data);
-                    localStorage.setItem('id',JSON.parse(data).id);
-                    localStorage.setItem('fname',JSON.parse(data).firstName);
-                    localStorage.setItem('token',JSON.parse(data).token);
-                    this.setState({
-                        authFlag : true,
-                        fname: JSON.parse(data).firstName
-                    });
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        authFlag : false,
-                        message: responseMessage
-                    })
-                })
-                
-            }
-        })
-        .catch(err => console.log(err));
+        this.props.loginBuyer(data);
     }
+    
     render(){
         //if Cookie is set render Buyer Home Page
         let redirectVar = null;
         if(localStorage.getItem('token')){
-            redirectVar = <Redirect to= {{ pathname: "/buyer/home", fname: this.state.fname}}/>
+            redirectVar = <Redirect to= {{ pathname: "/buyer/home", fname: this.props.fname}}/>
         }
         return(
             <div>
@@ -107,7 +68,7 @@ class BuyerLogin extends Component {
                     <div className="login-form">
                         <div className="main-div">
                             <div className="panel">
-                                <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                                <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2>
                                 <h2>Buyer Login</h2>
                                 <p>Sign in with your Grubhub Account</p>
                             </div>
@@ -131,4 +92,17 @@ class BuyerLogin extends Component {
     }
 }
 
-export default BuyerLogin;
+const mapDispatchToProps = dispatch => {
+    return {
+        loginBuyer: data => {dispatch(loginBuyer(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.auth.responseMessage,
+        fname: state.auth.fname
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BuyerLogin);

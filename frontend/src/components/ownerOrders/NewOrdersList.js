@@ -2,15 +2,6 @@ import React,{Component} from 'react';
 import NewOrder from './NewOrder';
 
 class NewOrdersList extends Component {
-     constructor(props){
-        super(props);
-        this.handleSendMessage = this.handleSendMessage.bind(this);
-    }
-
-    handleSendMessage(message){
-        this.props.onSendMessage(message);
-    }
-
     render(){
         return(
             <div>
@@ -26,7 +17,7 @@ class NewOrdersList extends Component {
                                 {
                                     this.props.orders ?
                                     this.props.orders.map(order => {
-                                        return <NewOrder order = {order} onSendMessage = {this.handleSendMessage}/>
+                                        return <NewOrder order = {order}/>
                                     })
                                     : <span/>
                                 }

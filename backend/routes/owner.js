@@ -104,7 +104,7 @@ router.get('/profilePic',passport.authenticate("jwt", { session: false }),functi
     });
 });
 
-router.post('/addRestaurant',passport.authenticate("jwt", { session: false }),function(req,res){
+router.post('/addRestaurant',function(req,res){
     console.log("Inside add Restaurant Post Request");
     console.log("Req Body : ",req.body);
     const restaurant = req.body;

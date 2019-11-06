@@ -61,7 +61,6 @@ const sectionsReducer = (state = initialState, action) => {
         case DELETE_SECTION_FAILED:
             return {
                 ...state,
-                sections,
                 sectionToHandle: action.payload.id,
                 responseMessage: action.payload.responseMessage,
                 addResponseMessage: ""

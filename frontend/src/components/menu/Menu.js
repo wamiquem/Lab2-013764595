@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import backendURL from '../../urlconfig';
 import {connect} from 'react-redux';
-import {menuChangeHandler, updateMenu} from '../../redux/actions/menusAction';
+import {menuChangeHandler, updateMenu, deleteMenu} from '../../redux/actions/menusAction';
 
 class Menu extends Component {
      constructor(props){
@@ -84,13 +84,10 @@ class Menu extends Component {
     postMenuData = (data,successcb) => {
         
         this.handleIsEditableOnUpdate(data, () => {
-            console.log("Back from Callback!!!!!!!!!");
             if(this.state.isNewImage){
                 successcb();
             }
             setTimeout(()=> {
-                console.log("Inside timeout!!!!!!!!!");
-                console.log("this.props.responseMessage==", this.props.responseMessage);
             if(this.props.responseMessage === 'Menu updated'){
                 this.setState({
                     isEditable: false
@@ -154,33 +151,34 @@ class Menu extends Component {
             sectionId: this.props.menu.section_id,
             ownerId: localStorage.getItem('id')
         }
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/deleteMenu`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => console.log(data));
-                this.props.onDelete(this.props.menu.id);
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    let responseMessage = JSON.parse(data).message;
-                    this.setState({
-                        message: responseMessage
-                    })
-                })
+        this.props.deleteMenu(data);
+        // const token = localStorage.getItem('token');
+        // fetch(`${backendURL}/restaurant/deleteMenu`, {
+        //     method: "POST",
+        //     headers: {
+        //         'Accept': 'application/json,  text/plain, */*',
+        //         'Content-Type': 'application/json',
+        //         'Authorization': `Bearer ${token}`
+        //     },
+        //     credentials: 'include',
+        //     body: JSON.stringify(data)
+        // })
+        // .then(res => {
+        //     if(res.status === 200){
+        //         res.text().then(data => console.log(data));
+        //         this.props.onDelete(this.props.menu.id);
+        //     }else{
+        //         res.text().then(data => {
+        //             console.log(data);
+        //             let responseMessage = JSON.parse(data).message;
+        //             this.setState({
+        //                 message: responseMessage
+        //             })
+        //         })
                 
-            }
-        })
-        .catch(err => console.log(err));
+        //     }
+        // })
+        // .catch(err => console.log(err));
     }
 
     render(){
@@ -272,8 +270,8 @@ class Menu extends Component {
 const mapDispatchToProps = dispatch => {
     return {
         handleEditChange: (id,name,value) => {dispatch(menuChangeHandler(id,name,value))},
-        updateMenu: data => {dispatch(updateMenu(data))}
-        // deleteSection: data => {dispatch(deleteSection(data))}
+        updateMenu: data => {dispatch(updateMenu(data))},
+        deleteMenu: data => {dispatch(deleteMenu(data))}
     }
 }
 

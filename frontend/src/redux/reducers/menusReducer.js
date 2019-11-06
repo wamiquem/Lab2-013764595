@@ -96,20 +96,19 @@ const menusReducer = (state = initialState, action) => {
                 sectionToHandle: action.payload.id,
                 addResponseMessage: ""
             }
-        // case DELETE_SECTION_SUCCESS:
-        //     var sections = state.sections.filter(section => section._id != action.payload.id);
-        //     return {
-        //         ...state,
-        //         sections
-        //     };
-        // case DELETE_SECTION_FAILED:
-        //     return {
-        //         ...state,
-        //         sections,
-        //         sectionToHandle: action.payload.id,
-        //         responseMessage: action.payload.responseMessage,
-        //         addResponseMessage: ""
-        //     };
+        case DELETE_MENU_SUCCESS:
+            var menus = state.menus.filter(menu => menu.id != action.payload.id);
+            return {
+                ...state,
+                menus
+            };
+        case DELETE_MENU_FAILED:
+            return {
+                ...state,
+                menuToHandle: action.payload.id,
+                responseMessage: action.payload.responseMessage,
+                addResponseMessage: ""
+            };
         default:
             return state;
     }

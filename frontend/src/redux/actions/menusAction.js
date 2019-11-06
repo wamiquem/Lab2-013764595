@@ -149,37 +149,37 @@ export const updateMenu = data => dispatch => {
         });
 };
 
-// export const deleteSection = data => dispatch => {
-//     const token = localStorage.getItem('token');
-//         fetch(`${backendURL}/restaurant/deleteSection`, {
-//             method: "POST",
-//             headers: {
-//                 'Accept': 'application/json,  text/plain, */*',
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`
-//             },
-//             credentials: 'include',
-//             body: JSON.stringify(data)
-//         })
-//         .then(res => {
-//             if(res.status === 200){
-//                 res.text().then(responseData => {
-//                     let payload = {id: data.id}
-//                     dispatch({
-//                         type: DELETE_SECTION_SUCCESS,
-//                         payload: payload
-//                     })
-//                 });
-//             }else{
-//                 res.text().then(responseData => {
-//                     let payload = {responseMessage: JSON.parse(responseData).message, id: data.id}
-//                     dispatch({
-//                         type: DELETE_SECTION_FAILED,
-//                         payload: payload
-//                     })
-//                 })
+export const deleteMenu = data => dispatch => {
+    const token = localStorage.getItem('token');
+        fetch(`${backendURL}/restaurant/deleteMenu`, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json,  text/plain, */*',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            if(res.status === 200){
+                res.text().then(responseData => {
+                    let payload = {id: data.id}
+                    dispatch({
+                        type: DELETE_MENU_SUCCESS,
+                        payload: payload
+                    })
+                });
+            }else{
+                res.text().then(responseData => {
+                    let payload = {responseMessage: JSON.parse(responseData).message, id: data.id}
+                    dispatch({
+                        type: DELETE_MENU_FAILED,
+                        payload: payload
+                    })
+                })
                 
-//             }
-//         })
-//         .catch(err => console.log(err));
-// };
+            }
+        })
+        .catch(err => console.log(err));
+};

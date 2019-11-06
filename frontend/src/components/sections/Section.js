@@ -49,11 +49,18 @@ class Section extends Component {
         }
 
         this.handleIsEditableOnUpdate(data, () => {
-            if(this.props.responseMessage === 'Section updated'){
-                this.setState({
-                    isEditable: false
-                })
-            }
+            setTimeout(()=> {
+                if(this.props.responseMessage === 'Section updated'){
+                    this.setState({
+                        isEditable: false
+                    })
+                }
+                }, 1000);
+            // if(this.props.responseMessage === 'Section updated'){
+            //     this.setState({
+            //         isEditable: false
+            //     })
+            // }
         })
     }
 

@@ -1,8 +1,8 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
 import MenuAddForm from './MenuAddForm';
 import MenusList from './MenusList';
-import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {getMenus} from '../../redux/actions/menusAction';
 
 class Menus extends Component {
     constructor(props){
@@ -74,54 +74,14 @@ class Menus extends Component {
     }
     
     componentDidMount(){
-        // if(localStorage.getItem('token')){
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/menus/?ownerId=${localStorage.getItem('id')}`,{
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include'
-            })
-        .then(res => res.json())
-        .then(data => {
-            let sections = data.sections.map(section => {
-                return{
-                    name: section.name,
-                    id: section._id
-                }
-            });
-            let sectionsWithMenus = data.sections.filter(section => section.menus);
-            let menus = sectionsWithMenus.map(section => {
-                let availableMenus = section.menus.map( menu => {
-                    return{
-                        initial_section_id: section._id,
-                        section_id: section._id,
-                        id: menu._id,
-                        name: menu.name,
-                        description: menu.description,
-                        price: menu.price,
-                        image: menu.image
-                    }
-                })
-                return availableMenus;
-            })
-            menus = menus.flat();
-            this.setState({
-                menus : this.state.menus.concat(menus),
-                sections: this.state.sections.concat(sections)
-            });
-        })
-        .catch(err => console.log(err));
+        this.props.getMenus();
     }    
 
     render(){
         return(
             <div>
-                {/* <MenuAddForm onAdd = {this.handleAdd} onSectionsLoad = {this.getSectionsFromMenuFormComponent}/> */}
-                <MenuAddForm onAdd = {this.handleAdd} sections = {this.state.sections}/>
-                <MenusList menus = {this.state.menus} sections = {this.state.sections}
+                <MenuAddForm onAdd = {this.handleAdd} sections = {this.props.sections}/>
+                <MenusList menus = {this.props.menus} sections = {this.props.sections}
                 onDelete = {this.handleDelete}
                 onEditChange = {this.handleEditChange}
                 onUpdate = {this.handleUpdate}/>
@@ -132,4 +92,18 @@ class Menus extends Component {
     }
 }
 
-export default Menus;
+const mapDispatchToProps = dispatch => {
+    return {
+        getMenus: () => {dispatch(getMenus())}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        sections: state.menus.sections,
+        menus: state.menus.menus
+
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menus);

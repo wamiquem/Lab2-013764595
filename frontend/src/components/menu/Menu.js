@@ -1,5 +1,7 @@
 import React,{Component} from 'react';
 import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {menuChangeHandler, updateMenu} from '../../redux/actions/menusAction';
 
 class Menu extends Component {
      constructor(props){
@@ -49,7 +51,7 @@ class Menu extends Component {
             fieldName = "section_id";
             fieldValue = section.id;
         }
-        this.props.onEditChange(this.props.menu.id, fieldName, fieldValue);
+        this.props.handleEditChange(this.props.menu.id, fieldName, fieldValue);
     }
 
     editMenu = () => {
@@ -74,44 +76,29 @@ class Menu extends Component {
         })
     }
 
+    handleIsEditableOnUpdate(data, cb){
+        this.props.updateMenu(data);       
+        cb(); 
+    }
+
     postMenuData = (data,successcb) => {
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/updateMenu`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(data => {
-                    console.log(data);
-                    this.props.onUpdate(this.props.menu.id, this.props.menu.section_id);
-                    if(this.state.isNewImage){
-                        successcb(JSON.parse(data).message);
-                    } else {
-                        this.setState({
-                            message: JSON.parse(data).message,
-                            isEditable: false
-                        })
-                    }
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message
-                    })
-                }) 
+        
+        this.handleIsEditableOnUpdate(data, () => {
+            console.log("Back from Callback!!!!!!!!!");
+            if(this.state.isNewImage){
+                successcb();
             }
+            setTimeout(()=> {
+                console.log("Inside timeout!!!!!!!!!");
+                console.log("this.props.responseMessage==", this.props.responseMessage);
+            if(this.props.responseMessage === 'Menu updated'){
+                this.setState({
+                    isEditable: false
+                })
+                
+            }
+            }, 1000);
         })
-        .catch(err => {
-            console.log(err);
-        });
     }
 
     //submit Login handler to send a request to the node backend
@@ -129,7 +116,9 @@ class Menu extends Component {
             ownerId: localStorage.getItem('id')
         }
 
-        this.postMenuData(data, success => {
+        this.postMenuData(data, () => {
+            console.log("Inside image!!!!!!!!!");
+            console.log("This.STATE===", this.state);
             const formData = new FormData();
             formData.append('image', this.state.imageFile);
             formData.append('menuId', this.props.menu.id);
@@ -149,7 +138,7 @@ class Menu extends Component {
                 res.text().then(data => {
                     console.log(data);
                     this.setState({
-                        message: JSON.parse(data).message + " " + success,
+                        message: JSON.parse(data).message,
                         isEditable: false
                     })
                 });
@@ -227,7 +216,11 @@ class Menu extends Component {
         return(
             <div>
                 <hr/>
-            <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                {
+                this.props.menu.id === this.props.menuToUpdate ? 
+                <h2 style= {{color:"red"}}>{`${this.props.responseMessage} ${this.state.message}`}</h2> : 
+                null
+                }
             <div className = "menu-card" >
                 <div class = "menu-image">
                     <label>Image</label>
@@ -276,4 +269,19 @@ class Menu extends Component {
     }
 }
 
-export default Menu;
+const mapDispatchToProps = dispatch => {
+    return {
+        handleEditChange: (id,name,value) => {dispatch(menuChangeHandler(id,name,value))},
+        updateMenu: data => {dispatch(updateMenu(data))}
+        // deleteSection: data => {dispatch(deleteSection(data))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.menus.responseMessage,
+        menuToUpdate: state.menus.menuToHandle
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menu);

@@ -20,9 +20,6 @@ export const getSections = () => dispatch => {
                     type: GET_SECTIONS,
                     payload: payload
                 }) 
-            // this.setState({
-            //     sections : this.state.sections.concat(data.sections)
-            // });
         })
         .catch(err => console.log(err));
     }   
@@ -133,8 +130,6 @@ export const deleteSection = data => dispatch => {
                         payload: payload
                     })
                 });
-                // res.text().then(data => console.log(data));
-                // this.props.onDelete(this.props.section._id);
             }else{
                 res.text().then(responseData => {
                     let payload = {responseMessage: JSON.parse(responseData).message, id: data.id}
@@ -142,45 +137,9 @@ export const deleteSection = data => dispatch => {
                         type: DELETE_SECTION_FAILED,
                         payload: payload
                     })
-                    // let responseMessage = JSON.parse(data).message;
-                    // this.setState({
-                    //     message: responseMessage
-                    // })
                 })
                 
             }
         })
         .catch(err => console.log(err));
-    // const token = localStorage.getItem('token');
-    //     fetch(`${backendURL}/restaurant/updateSection`, {
-    //         method: "POST",
-    //         headers: {
-    //             'Accept': 'application/json,  text/plain, */*',
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${token}`
-    //         },
-    //         credentials: 'include',
-    //         body: JSON.stringify(data)
-    //     })
-    //     .then(res => {
-    //         if(res.status === 200){
-    //             res.text().then(responseData => {
-    //                 let payload = {responseMessage: JSON.parse(responseData).message, id: data.id}
-    //                 dispatch({
-    //                     type: UPDATE_SECTION,
-    //                     payload: payload
-    //                 })
-    //             });
-    //         }else{
-    //             res.text().then(responseData => {
-    //                 let payload = {responseMessage: JSON.parse(responseData).message, id: data.id}
-    //                 dispatch({
-    //                     type: UPDATE_SECTION,
-    //                     payload: payload
-    //                 })
-    //             })
-                
-    //         }
-    //     })
-    //     .catch(err => console.log(err));
 };

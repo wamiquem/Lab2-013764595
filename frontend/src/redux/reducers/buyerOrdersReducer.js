@@ -1,4 +1,4 @@
-import { GET_BUYER_UPCOMING_ORDERS, UPDATE_UPCOMING_ORDER_SUCCESS,
+import { GET_BUYER_UPCOMING_ORDERS, UPDATE_UPCOMING_ORDER_SUCCESS, SET_UPCOMING_ORDERS_ON_DRAG,
 GET_BUYER_PAST_ORDERS, UPDATE_PAST_ORDER_SUCCESS, UPDATE_ORDER_FAILED} from '../actions/types';
 
 const initialState = {
@@ -57,6 +57,11 @@ const buyerOrdersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 responseMessage: action.payload.responseMessage
+            }
+        case SET_UPCOMING_ORDERS_ON_DRAG:
+            return {
+                ...state,
+                upcomingOrders: initialState.upcomingOrders.concat(action.payload.orders)
             }
         default:
             return state;

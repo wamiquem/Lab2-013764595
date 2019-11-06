@@ -13,7 +13,7 @@ describe("Grubhub Testing", function () {
         it('Email already exists', function () {
             agent.post("/buyer/signup")
                 .send({ firstName: "testfirst", lastName: "testlast", 
-                email: "change1@gmail.com", password: "test123" })
+                email: "laxmi@sjsu.edu", password: "test123" })
                 .then(function (res) {
                     expect(JSON.parse(res.text).message).to.equal("Email already exists. Plz sign up with a different email id");
                 })
@@ -27,7 +27,7 @@ describe("Grubhub Testing", function () {
 
         it('Logged in', function () {
             agent.post("/owner/login")
-                .send({ email: "new2@gmail.com", password: "test123" })
+                .send({ email: "chris@sjsu.edu", password: "test123" })
                 .then(function (res) {
                     expect(JSON.parse(res.text).success).to.equal(true);
                 })
@@ -41,7 +41,7 @@ describe("Grubhub Testing", function () {
 
         it('Add Section', function () {
             agent.post("/restaurant/addSection")
-                .send({ name:"Combo", ownerId: "2"})
+                .send({ name:"Combo2", ownerId: "5db768574cedbe51c9c8b591"})
                 .then(function (res) {
                     expect(JSON.parse(res.text).message).to.equal("Section added");
                 })
@@ -52,7 +52,7 @@ describe("Grubhub Testing", function () {
 
         it('Delete Section', function () {
             agent.post("/restaurant/deleteSection")
-                .send({ id: "59"})
+                .send({ ownerId: "5db768574cedbe51c9c8b591", id: "5dc23317230b5d0bbef84c0a"})
                 .then(function (res) {
                     expect(JSON.parse(res.text).message).to.equal("Section deleted");
                 })
@@ -66,9 +66,9 @@ describe("Grubhub Testing", function () {
 
         it('Get Firstname', function () {
             agent.get("/buyer/firstName")
-                .send({ id: "3" })
+                .send({ id: "5da8f01820c2be9f2d48699a" })
                 .then(function (res) {
-                    expect(JSON.parse(res.text).firstName).to.equal("buyer1first");
+                    expect(JSON.parse(res.text).firstName).to.equal("Laxmi2");
                 })
                 .catch(error => {
                     console.log(error);

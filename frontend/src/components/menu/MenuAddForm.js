@@ -1,8 +1,7 @@
 import React,{Component} from 'react';
-import cookie from 'react-cookies';
-import {Redirect} from 'react-router';
 import menuImage from '../../images/menu_default_image.png'
-import backendURL from '../../urlconfig';
+import {connect} from 'react-redux';
+import {addMenu} from '../../redux/actions/menusAction';
 
 class MenuAddForm extends Component {
      constructor(props){
@@ -14,7 +13,6 @@ class MenuAddForm extends Component {
             description: "",
             price: "",
             section: "",
-            message: "",
             isNewImage: false
         }
         //Bind the handlers to this class
@@ -39,47 +37,47 @@ class MenuAddForm extends Component {
         })
     }
 
-    postMenuData = (data,successcb) => {
-        const token = localStorage.getItem('token');
-        fetch(`${backendURL}/restaurant/addMenu/`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json,  text/plain, */*',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
-        })
-        .then(res => {
-            if(res.status === 200){
-                res.text().then(resData => {
-                    console.log(resData);
-                    this.props.onAdd({
-                        id: JSON.parse(resData).menuId, section_id: data.sectionId, 
-                        name: this.state.name, description: this.state.description, price: this.state.price
-                    });
-                    if(this.state.isNewImage){
-                        successcb(JSON.parse(resData).message, JSON.parse(resData).menuId, data.sectionId);
-                    } else {
-                        this.setState({
-                            message: JSON.parse(resData).message
-                        })
-                    }
-                });
-            }else{
-                res.text().then(data => {
-                    console.log(data);
-                    this.setState({
-                        message: JSON.parse(data).message
-                    })
-                }) 
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    }
+    // postMenuData = (data,successcb) => {
+    //     const token = localStorage.getItem('token');
+    //     fetch(`${backendURL}/restaurant/addMenu/`, {
+    //         method: "POST",
+    //         headers: {
+    //             'Accept': 'application/json,  text/plain, */*',
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${token}`
+    //         },
+    //         credentials: 'include',
+    //         body: JSON.stringify(data)
+    //     })
+    //     .then(res => {
+    //         if(res.status === 200){
+    //             res.text().then(resData => {
+    //                 console.log(resData);
+    //                 this.props.onAdd({
+    //                     id: JSON.parse(resData).menuId, section_id: data.sectionId, 
+    //                     name: this.state.name, description: this.state.description, price: this.state.price
+    //                 });
+    //                 if(this.state.isNewImage){
+    //                     successcb(JSON.parse(resData).message, JSON.parse(resData).menuId, data.sectionId);
+    //                 } else {
+    //                     this.setState({
+    //                         message: JSON.parse(resData).message
+    //                     })
+    //                 }
+    //             });
+    //         }else{
+    //             res.text().then(data => {
+    //                 console.log(data);
+    //                 this.setState({
+    //                     message: JSON.parse(data).message
+    //                 })
+    //             }) 
+    //         }
+    //     })
+    //     .catch(err => {
+    //         console.log(err);
+    //     });
+    // }
 
     //submit Login handler to send a request to the node backend
     submitAdd = (e) => {
@@ -95,33 +93,34 @@ class MenuAddForm extends Component {
             price: this.state.price
         }
 
-        this.postMenuData(data, (success, menuId, sectionId) => {
-            if(this.state.isNewImage){
-                const formData = new FormData();
-                formData.append('image', document.querySelector('input[type="file"]').files[0]);
-                formData.append('menuId', menuId);
-                formData.append('sectionId', sectionId);
-                formData.append('ownerId', localStorage.getItem('id'));
+        this.props.addMenu(data, this.state.isNewImage);
+        // this.postMenuData(data, (success, menuId, sectionId) => {
+        //     if(this.state.isNewImage){
+        //         const formData = new FormData();
+        //         formData.append('image', document.querySelector('input[type="file"]').files[0]);
+        //         formData.append('menuId', menuId);
+        //         formData.append('sectionId', sectionId);
+        //         formData.append('ownerId', localStorage.getItem('id'));
                 
-                const token = localStorage.getItem('token');
-                fetch(`${backendURL}/upload/menu-image`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                      },
-                    credentials: 'include',
-                    body: formData
-                })
-                .then(res => {
-                    res.text().then(data => {
-                        console.log(data);
-                        this.setState({
-                            message: JSON.parse(data).message + " " + success
-                        })
-                    });
-                })
-            }
-        });
+        //         const token = localStorage.getItem('token');
+        //         fetch(`${backendURL}/upload/menu-image`, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Authorization': `Bearer ${token}`
+        //               },
+        //             credentials: 'include',
+        //             body: formData
+        //         })
+        //         .then(res => {
+        //             res.text().then(data => {
+        //                 console.log(data);
+        //                 this.setState({
+        //                     message: JSON.parse(data).message + " " + success
+        //                 })
+        //             });
+        //         })
+        //     }
+        // });
     }
 
     render(){
@@ -132,7 +131,7 @@ class MenuAddForm extends Component {
                     <div className="add-menu-form">
                         <div className="main-div">
                             <div className="panel">
-                            <h2 style= {{color:"red"}}>{this.state.message}</h2>
+                            <h2 style= {{color:"red"}}>{this.props.responseMessage}</h2>
                                 <h4>Add Menu</h4>
                                 <hr/>
                                 <div style={{display:'flex'}}>
@@ -179,4 +178,16 @@ class MenuAddForm extends Component {
     }
 }
 
-export default MenuAddForm;
+const mapDispatchToProps = dispatch => {
+    return {
+        addMenu: (data, isNewImage) => {dispatch(addMenu(data, isNewImage))}
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        responseMessage: state.menus.addResponseMessage
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MenuAddForm);

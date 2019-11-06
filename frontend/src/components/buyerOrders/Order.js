@@ -38,7 +38,7 @@ class Order extends Component {
             );
         });
         return(
-            <div>
+            <div >
                 <hr/>
                 <label style = {{fontSize:'17px'}}>Order# {this.props.order.id}</label>
                 <button style = {{marginLeft:'20px'}} onClick = {this.showMessageModal}

@@ -25,7 +25,6 @@ const sectionsReducer = (state = initialState, action) => {
         case ADD_SECTION_FAILED:
             return{
                 ...state,
-                sections: [...state.sections, action.payload.section],
                 addResponseMessage: action.payload.responseMessage,
                 responseMessage:""
             }
@@ -67,28 +66,6 @@ const sectionsReducer = (state = initialState, action) => {
                 responseMessage: action.payload.responseMessage,
                 addResponseMessage: ""
             };
-        // case UPDATE_ORDER_SUCCESS:
-        //     const orders = state.orders.map(order => {
-        //         // Find an order with the matching id
-        //         if(order.id == action.payload.message.orderId){
-        //             //Return a new object
-        //             let orderToUpdate = {...order}
-        //             orderToUpdate.messages = orderToUpdate.messages.concat(action.payload.message);
-        //             return orderToUpdate;
-        //         }
-        //         // Leave every other order unchanged
-        //         return order;
-        //     });
-        //     return {
-        //         ...state,
-        //         orders,
-        //         responseMessage: action.payload.responseMessage
-        //     }
-        // case UPDATE_ORDER_FAILED:
-        //     return {
-        //         ...state,
-        //         responseMessage: action.payload.responseMessage
-        //     }
         default:
             return state;
     }

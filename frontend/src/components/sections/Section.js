@@ -1,5 +1,4 @@
 import React,{Component} from 'react';
-import backendURL from '../../urlconfig';
 import {connect} from 'react-redux';
 import {sectionChangeHandler, updateSection, deleteSection} from '../../redux/actions/sectionsAction';
 

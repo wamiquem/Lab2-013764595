@@ -6,6 +6,7 @@ import restaurantProfileReducer from "./restaurantProfileReducer";
 import ownerOrdersReducer from "./ownerOrdersReducer";
 import buyerOrdersReducer from "./buyerOrdersReducer";
 import sectionsReducer from "./sectionsReducer";
+import menusReducer from "./menusReducer";
 
 export default combineReducers({
     auth: authReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
     restaurantProfile: restaurantProfileReducer,
     ownerOrders: ownerOrdersReducer,
     buyerOrders: buyerOrdersReducer,
-    sections: sectionsReducer
+    sections: sectionsReducer,
+    menus: menusReducer
 });
